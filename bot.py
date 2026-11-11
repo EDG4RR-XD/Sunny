@@ -36,7 +36,16 @@ ITEMS = {
     'Ultra Ball': {'gold': 600, 'shards': 4},
     'Dice': {'gold': 1000, 'shards': 1},
     'Trait Brush': {'gold': 1500, 'shards': 5},
+    'Species Egg': {'gold': 2000, 'shards': 20},
+    'Trait Egg': {'gold': 1000, 'shards': 5},
+    'Rare Egg': {'gold': 10000, 'shards': 100},
+    'Trait Eraser': {'gold': 2000, 'shards': 15},
+    'DNA Splicer': {'gold': 1000, 'shards': 9},
 }
+# Specific brushes are inventory items awarded only by /release.
+SPECIFIC_BRUSHES = {f'{trait} Trait Brush': trait for trait in ALL_TRAITS}
+RARE_BRUSH_TRAITS = set(NOSPAWN_TRAITS)
+ITEMS.update({name: {'gold': None, 'shards': None} for name in SPECIFIC_BRUSHES})
 ITEM_LOOKUP = {s.casefold(): s for s in ITEMS}
 BALL_RATES = {'Pokeball': 0.40, 'Great Ball': 0.60, 'Ultra Ball': 0.80}
 ART_TYPES = {'Headshot': 200, 'Halfbody': 500, 'Fullbody': 1000}
@@ -272,6 +281,69 @@ def roll_die_trait(existing: list[str]) -> str | None:
     return random.choices(pool, weights=[0.2 if t in NOSPAWN_TRAITS else 1.0 for t in pool],k=1)[0]
 
 
+def species_list(raw: str) -> list[str]:
+    """Existing rows contain a plain species; hybrids use a JSON list of two."""
+    try:
+        parsed = json.loads(raw)
+        if isinstance(parsed, list) and parsed and all(isinstance(x, str) for x in parsed):
+            return parsed
+    except (ValueError, TypeError):
+        pass
+    return [raw]
+
+
+def species_display(raw: str) -> str:
+    return ' / '.join(species_list(raw))
+
+
+def add_hybrid_species(raw: str, selected: str | None = None) -> str:
+    species = species_list(raw)
+    if len(species) >= 2:
+        raise ValueError('This creature already has two species. Remove one using a DNA Splicer first.')
+    if selected is None:
+        choices = [name for name in CREATURES if name != species[0]]
+        if not choices:
+            raise ValueError('No second species available.')
+        second = random.choice(choices)
+    else:
+        second = canonical_creature(selected)
+        if second == species[0]:
+            raise ValueError('The hybrid species must differ from the existing species.')
+    return json.dumps([species[0], second], ensure_ascii=False)
+
+
+def add_trait_to_creature(cid: int, creature: sqlite3.Row, trait: str, hybrid_species: str | None = None) -> str | None:
+    traits = json.loads(creature['traits'])
+    if trait in traits:
+        raise ValueError('That creature already has this trait.')
+    new_species = creature['species']
+    if trait == 'Hybrid':
+        new_species = add_hybrid_species(new_species, hybrid_species)
+    elif hybrid_species is not None:
+        raise ValueError('A hybrid species can only be supplied when applying Hybrid.')
+    traits.append(trait)
+    conn().execute('UPDATE creatures SET traits=?,species=? WHERE id=?',
+                   (json.dumps(traits),new_species,cid))
+    return species_list(new_species)[1] if trait == 'Hybrid' else None
+
+
+def roll_release_item() -> str | None:
+    """50% item chance; Rare Egg occurs in 1% of all releases."""
+    if random.random() >= 0.5:
+        return None
+    if random.random() < 0.02:
+        return 'Rare Egg'
+    # Two regular eggs share the pool with the trait brushes. Epic is
+    # exactly 1% of brush rewards; remaining rare brushes have low weight.
+    if random.random() < 0.08:
+        return random.choice(['Species Egg', 'Trait Egg'])
+    if random.random() < 0.01:
+        return 'Epic Trait Brush'
+    brush_pool = [name for name,trait in SPECIFIC_BRUSHES.items() if trait != 'Epic']
+    brush_weights = [0.25 if SPECIFIC_BRUSHES[name] in RARE_BRUSH_TRAITS else 4.0 for name in brush_pool]
+    return random.choices(brush_pool, weights=brush_weights, k=1)[0]
+
+
 def safe_discord_text(value: str) -> str:
     # Prevent mentions and markdown injection inside creature labels.
     return discord.utils.escape_mentions(discord.utils.escape_markdown(value))
@@ -279,7 +351,7 @@ def safe_discord_text(value: str) -> str:
 
 def fmt_c(c: sqlite3.Row) -> str:
     # Link to the newest approved design.
-    species = safe_discord_text(c['species'])
+    species = safe_discord_text(species_display(c['species']))
     approved = conn().execute(
         'SELECT submission_url FROM designs WHERE guild=? AND creature_id=? AND status=? ORDER BY id DESC LIMIT 1',
         (c['guild'], c['id'], 'approved')).fetchone()
@@ -612,7 +684,7 @@ async def active(interaction:discord.Interaction,id:int):
         c=own_creature(gid,uid,id)
         userrow(gid,uid)
         conn().execute('UPDATE users SET active_id=? WHERE guild=? AND user=?',(id,gid,uid))
-    await feedback(interaction,f'#{id} {c["species"]} is now active. EXP: {c["exp"]}/{exp_needed(c["level"])}.')
+    await feedback(interaction,f'#{id} {species_display(c["species"])} is now active. EXP: {c["exp"]}/{exp_needed(c["level"])}.')
 
 
 @bot.tree.command(name='candy',description='Use Rare Candies to raise your creature level.')
@@ -639,32 +711,42 @@ async def dice(interaction:discord.Interaction,id:int):
             if not rolled:
                 raise ValueError('This creature already has every available trait.')
             change_item(gid,uid,'Dice',-1)
-            traits.append(rolled)
-            conn().execute('UPDATE creatures SET traits=? WHERE id=?',(json.dumps(traits),id))
-            return rolled
+            second=add_trait_to_creature(id,c,rolled)
+            return rolled,second
         result=transacted(use)
-    await feedback(interaction,f'#{id} gained **{result}**!')
+    await feedback(interaction,f'#{id} gained **{result[0]}**!' + (f' Hybrid species: **{result[1]}**.' if result[1] else ''))
 
 
 trait_group=app_commands.Group(name='trait',description='Creature trait commands')
-@trait_group.command(name='add',description='Use one Trait Brush to apply a spawnable trait to a creature.')
-@app_commands.autocomplete(trait=trait_autocomplete)
-async def trait_add(interaction:discord.Interaction,id:int,trait:str):
+@trait_group.command(name='add',description='Apply a trait using its specific brush or a generic Trait Brush.')
+@app_commands.autocomplete(trait=trait_autocomplete,hybrid_species=creature_autocomplete)
+async def trait_add(interaction:discord.Interaction,id:int,trait:str,hybrid_species:str|None=None):
     gid,uid=guild_only(interaction)
-    wanted=parse_traits(trait,allow_nospawn=False)
+    wanted=parse_traits(trait)
     if len(wanted)!=1:
         raise ValueError('Apply one trait per brush.')
+    trait_name=wanted[0]
+    if hybrid_species is not None and trait_name != 'Hybrid':
+        raise ValueError('hybrid_species is only valid for Hybrid.')
     async with mutex:
         def use():
             c=own_creature(gid,uid,id)
-            traits=json.loads(c['traits'])
-            if wanted[0] in traits:
-                raise ValueError('That creature already has this trait.')
-            change_item(gid,uid,'Trait Brush',-1)
-            traits.append(wanted[0])
-            conn().execute('UPDATE creatures SET traits=? WHERE id=?',(json.dumps(traits),id))
-        transacted(use)
-    await feedback(interaction,f'Added **{wanted[0]}** to creature #{id}.')
+            named=f'{trait_name} Trait Brush'
+            if item_count(gid,uid,named):
+                used=named
+            elif (trait_name in NORMAL_TRAITS or trait_name == 'Hybrid') and item_count(gid,uid,'Trait Brush'):
+                used='Trait Brush'
+            else:
+                raise ValueError(f'You need a {named}' + (' or generic Trait Brush.' if trait_name in NORMAL_TRAITS or trait_name == 'Hybrid' else '.'))
+            if hybrid_species is not None and used != named:
+                raise ValueError('Choosing the second species requires a specific Hybrid Trait Brush. Generic brushes roll randomly.')
+            # Validate all species/traits before consuming the brush.
+            second=add_trait_to_creature(id,c,trait_name,hybrid_species if used == named else None)
+            change_item(gid,uid,used,-1)
+            return used,second
+        used,second=transacted(use)
+    await feedback(interaction,f'Used **{used}**. Added **{trait_name}** to creature #{id}.' + (f' Second species: **{second}**.' if second else ''))
+
 bot.tree.add_command(trait_group)
 
 
@@ -705,7 +787,7 @@ async def design_submit(interaction:discord.Interaction,id:int,image:discord.Att
         raise ValueError('Artist must be a human server member.')
     async with mutex:
         c=own_creature(gid,uid,id)
-        species=c['species']
+        species=species_display(c['species'])
     reward_user = artist or interaction.user
     await interaction.response.defer(thinking=True)
     header = (
@@ -936,7 +1018,8 @@ bot.tree.add_command(inventory_group)
 shop_group=app_commands.Group(name='shop',description='Buy helpful creature items')
 @shop_group.command(name='view',description='See shop prices.')
 async def shop_view(interaction:discord.Interaction):
-    lines=[f'**{item}**: {cost["gold"]:,} Gold Coins OR {cost["shards"]} Diamond Shards' for item,cost in ITEMS.items()]
+    lines=[f'**{item}**: {cost["gold"]:,} Gold Coins OR {cost["shards"]} Diamond Shards' for item,cost in ITEMS.items() if cost['gold'] is not None]
+    lines.append('Specific Trait Brushes: release-only; cannot be purchased.')
     await feedback(interaction,'**Sunny’s Shop**\n'+'\n'.join(lines),False)
 
 @shop_group.command(name='buy',description='Buy one or more items with one currency.')
@@ -947,6 +1030,8 @@ async def shop_buy(interaction:discord.Interaction,item:str,currency:app_command
     item=ITEM_LOOKUP.get(item.casefold().strip())
     if not item:
         raise ValueError('That item is not available in the shop.')
+    if ITEMS[item][currency.value] is None:
+        raise ValueError('Specific Trait Brushes can only be obtained from /release.')
     price=ITEMS[item][currency.value]*quantity
     async with mutex:
         def buy():
@@ -955,6 +1040,94 @@ async def shop_buy(interaction:discord.Interaction,item:str,currency:app_command
         transacted(buy)
     await feedback(interaction,f'Purchased {quantity}× {item} for {price:,} {"Gold Coins" if currency.value=="gold" else "Diamond Shards"}.')
 bot.tree.add_command(shop_group)
+
+
+@bot.tree.command(name='release',description='Release your creature, recycle its ID, and receive 50–100 GC plus a possible item.')
+async def release(interaction:discord.Interaction,id:int):
+    gid,uid=guild_only(interaction)
+    async with mutex:
+        def execute():
+            c=own_creature(gid,uid,id)
+            species=species_display(c['species'])
+            gold=random.randint(50,100)
+            item=roll_release_item()
+            delete_creature(id)
+            change_money(gid,uid,'gold',gold)
+            if item:
+                change_item(gid,uid,item,1)
+            return species,gold,item
+        species,gold,item=transacted(execute)
+    await feedback(interaction,f'Released **#{id} {safe_discord_text(species)}**. ID #{id} is available for reuse. Earned **{gold} Gold Coins**.' + (f' Item drop: **{item}**!' if item else ' No item dropped.'))
+
+
+item_group=app_commands.Group(name='item',description='Use eggs, trait erasers, and DNA splicers')
+@item_group.command(name='use',description='Use an egg, Trait Eraser, or DNA Splicer.')
+@app_commands.choices(item=[app_commands.Choice(name=x,value=x) for x in ('Species Egg','Trait Egg','Rare Egg','Trait Eraser','DNA Splicer')])
+@app_commands.autocomplete(species=creature_autocomplete,trait=trait_autocomplete)
+async def item_use(interaction:discord.Interaction,item: str,
+                   id:int|None=None,species:str|None=None,trait:str|None=None,
+                   remove_species:app_commands.Range[int,1,2]|None=None):
+    gid,uid=guild_only(interaction)
+    item_names={name.casefold():name for name in ('Species Egg','Trait Egg','Rare Egg','Trait Eraser','DNA Splicer')}
+    item=item_names.get(item.strip().casefold())
+    if item is None:
+        raise ValueError('Choose Species Egg, Trait Egg, Rare Egg, Trait Eraser, or DNA Splicer.')
+    # Slash command optional fields supply context appropriate to each item.
+    if item in ('Species Egg','Trait Egg','Rare Egg'):
+        if item in ('Species Egg','Rare Egg') and species is None:
+            raise ValueError('Choose a species.')
+        if item in ('Trait Egg','Rare Egg') and trait is None:
+            raise ValueError('Choose a trait.')
+        selected_species=canonical_creature(species) if species is not None and item != 'Trait Egg' else None
+        selected_trait=parse_traits(trait)[0] if trait is not None and item != 'Species Egg' else None
+        if selected_trait and len(parse_traits(trait)) != 1:
+            raise ValueError('Choose exactly one trait.')
+        async with mutex:
+            def hatch():
+                if item_count(gid,uid,item)<1:
+                    raise ValueError('You do not have a '+item+'.')
+                name=selected_species or random.choice(CREATURES)
+                t=selected_trait or 'Basic'
+                raw_species=add_hybrid_species(name) if t == 'Hybrid' else name
+                change_item(gid,uid,item,-1)
+                cid=create_creature(gid,uid,raw_species,[t],1)
+                return cid,raw_species,t
+            cid,raw_species,t=transacted(hatch)
+        await feedback(interaction,f'Hatched **#{cid} {safe_discord_text(species_display(raw_species))}**, Lv. 1, trait: **{t}**.')
+        return
+    if id is None:
+        raise ValueError('Supply the creature ID.')
+    async with mutex:
+        def modify():
+            c=own_creature(gid,uid,id)
+            traits=json.loads(c['traits'])
+            if item == 'Trait Eraser':
+                if trait is None:
+                    raise ValueError('Choose the trait to erase.')
+                chosen=parse_traits(trait)
+                if len(chosen)!=1 or chosen[0] not in traits:
+                    raise ValueError('That creature does not have that trait.')
+                if chosen[0]=='Hybrid' and len(species_list(c['species']))>1:
+                    raise ValueError('Remove one hybrid species with a DNA Splicer before erasing Hybrid.')
+                change_item(gid,uid,item,-1)
+                traits.remove(chosen[0])
+                conn().execute('UPDATE creatures SET traits=? WHERE id=?',(json.dumps(traits),id))
+                return 'Removed trait '+chosen[0]
+            species_entries=species_list(c['species'])
+            if len(species_entries)!=2:
+                raise ValueError('This creature does not have two hybrid species.')
+            if remove_species is None:
+                raise ValueError('Set remove_species to 1 or 2 to select the species to remove.')
+            change_item(gid,uid,item,-1)
+            removed=species_entries.pop(remove_species-1)
+            if 'Hybrid' in traits:
+                traits.remove('Hybrid')
+            conn().execute('UPDATE creatures SET species=?,traits=? WHERE id=?',
+                           (species_entries[0],json.dumps(traits),id))
+            return f'Removed hybrid species {removed}; remaining species: {species_entries[0]}'
+        result=transacted(modify)
+    await feedback(interaction,f'Used **{item}** on #{id}. {result}.')
+bot.tree.add_command(item_group)
 
 
 @bot.tree.command(name='giveitem',description='Admin: grant items to a user.')
@@ -1098,7 +1271,7 @@ async def trade(interaction:discord.Interaction,user:discord.Member,
 @bot.tree.command(name='help_sunny',description='List Sunny the Junipyro commands.')
 async def help_sunny(interaction:discord.Interaction):
     await feedback(interaction,
-        '**Collect:** /active, /inventory creatures, /inventory items, /balance, /candy, /dice, /trait add, /nickname, /design submit, /art submit\n'
+        '**Collect:** /active, /inventory creatures, /inventory items, /balance, /release, /item use, /candy, /dice, /trait add, /nickname, /design submit, /art submit\n'
         '**Shop:** /shop view, /shop buy\n'
         '**Trade:** /trade\n'
         '**Admin:** /spawnchannel, /spawnnow, /cspawn, /clevel, /cdelete, /giveitem, /takeitem, /givecurrency, /takecurrency, /design approve, /design deny, /art approve, /art deny\n'

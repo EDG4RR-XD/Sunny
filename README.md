@@ -88,3 +88,20 @@ The shop, catch, and trade use SQLite transactions with an async mutex to preven
 Discord requires `/design` to be a slash-command group so its submit, approve, and deny actions use `/design submit`, `/design approve`, and `/design deny` instead of `/design <id>`.
 
 Design IDs are unique and increment independently of creature IDs. A creature may have multiple submissions; its newest approved design is linked. Approved designs and nicknames stay with the creature on trade. When a creature is deleted, its submissions are removed from the database so reused creature IDs do not inherit an old design. Old Discord submission messages are not deleted. All design and nickname responses are public. Store your SQLite database at `/data/sunny.db` on the Railway volume so approval records and nicknames persist across deployments. Existing databases are automatically migrated on startup.
+
+## Releasing creatures, eggs, and trait tools
+
+- `/release id`: permanently removes an owned creature, returns its ID to the reusable pool, and awards **50–100 Gold Coins**. Each release has a **50% chance** of one item. A **Rare Egg** drops from **1% of all releases**. Other drops are Species Eggs, Trait Eggs, and individual Trait Brushes. Epic brushes have a **1% chance among brush drops**; other rare brushes (Gilded, Ghostly, Crystalline, Holographic, Glitched, Celestial, Hybrid, Angelic, Polycephalic) have reduced weights.
+- `/item use item:Species Egg species:<species>`: gives a level-1 Basic creature of the selected species.
+- `/item use item:Trait Egg trait:<trait>`: gives a level-1 creature of a random species with exactly that trait.
+- `/item use item:Rare Egg species:<species> trait:<trait>`: gives a level-1 creature with exactly the chosen trait and species.
+- `/item use item:Trait Eraser id:<ID> trait:<trait>`: removes one selected trait. To remove Hybrid from a two-species creature, use a DNA Splicer first.
+- `/item use item:DNA Splicer id:<ID> remove_species:1-or-2`: removes the chosen species from a hybrid and removes its Hybrid trait.
+- `/trait add id:<ID> trait:<trait> [hybrid_species:<species>]`: uses a corresponding **specific Trait Brush** if owned; for normal traits, falls back to a generic Trait Brush. For a Hybrid Trait Brush, choose the second species with `hybrid_species`. Generic Trait Brushes can apply regular traits and Hybrid. Generic Hybrid application chooses the second species randomly; other rare traits require their specific brushes.
+- `/dice id`: when Hybrid is rolled, a random *different* second species is attached.
+
+Specific Trait Brushes exist for **every** trait in `traits.json`, including the rare traits. All are **release-only** and cannot be bought from `/shop buy`, but can be traded or granted by an admin. They appear in `/inventory items` and item autocompletion. Existing individual species values remain compatible with the database; two-species hybrids are serialized as a JSON array in `creatures.species`, displayed as `Species A / Species B` in creature listings and design messages.
+
+New shop items (Gold Coins / Diamond Shards): Species Egg **2,000 / 20**, Trait Egg **1,000 / 5**, Rare Egg **10,000 / 100**, Trait Eraser **2,000 / 15**, DNA Splicer **1,000 / 9**.
+
+Before deploying, back up your SQLite database. This update uses the existing tables without a schema migration. Release removal is permanent, including approved design database records; existing Discord design messages remain on Discord.
