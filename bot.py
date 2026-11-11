@@ -103,12 +103,25 @@ def item_count(guild: int, user: int, name: str) -> int:
 
 
 def change_item(guild: int, user: int, name: str, delta: int) -> None:
-    if item_count(guild,user,name) + delta < 0:
+    """Adjust an item balance without violating SQLite's nonnegative CHECK.
+
+    Negative quantities must be applied using UPDATE, rather than inserting
+    a negative quantity into an UPSERT (SQLite checks the inserted row first).
+    """
+    if delta == 0:
+        return
+    if delta > 0:
+        conn().execute('INSERT INTO items(guild,user,name,qty) VALUES(?,?,?,?) '
+                       'ON CONFLICT(guild,user,name) DO UPDATE SET qty=qty+excluded.qty',
+                       (guild,user,name,delta))
+        return
+    result = conn().execute(
+        'UPDATE items SET qty=qty+? WHERE guild=? AND user=? AND name=? AND qty>=?',
+        (delta,guild,user,name,-delta))
+    if result.rowcount != 1:
         raise ValueError('Not enough ' + name + '.')
-    conn().execute('INSERT INTO items(guild,user,name,qty) VALUES(?,?,?,?) '
-                   'ON CONFLICT(guild,user,name) DO UPDATE SET qty=qty+excluded.qty',
-                   (guild,user,name,delta))
-    conn().execute('DELETE FROM items WHERE guild=? AND user=? AND name=? AND qty=0',(guild,user,name))
+    conn().execute('DELETE FROM items WHERE guild=? AND user=? AND name=? AND qty=0',
+                   (guild,user,name))
 
 
 def change_money(guild: int, user: int, column: str, delta: int) -> None:
@@ -288,48 +301,61 @@ class CatchSelect(discord.ui.Select):
         super().__init__(placeholder='Choose a Pokéball',min_values=1,max_values=1,options=opts)
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        gid,uid=guild_only(interaction)
-        lock=spawn_locks.setdefault(gid,asyncio.Lock())
-        async with lock:
-            async with mutex:
-                entry=spawns.get(gid)
-                if not entry or entry['id'] != self.spawn_id or entry['caught']:
-                    await feedback(interaction,'This wild creature is no longer available.')
-                    return
-                ball=self.values[0]
-                if item_count(gid,uid,ball)<1:
-                    await feedback(interaction,f'You have no {ball}s left.')
-                    return
-                def roll():
-                    change_item(gid,uid,ball,-1)
-                    success=random.random()<BALL_RATES[ball]
-                    if not success:
-                        return None
-                    cid=create_creature(gid,uid,entry['species'],entry['traits'],5)
-                    gold=random.randint(1,50)
-                    change_money(gid,uid,'gold',gold)
-                    earned=random.randint(10,100)
-                    leveled=give_catch_exp(gid,uid,earned)
-                    return cid,gold,earned,leveled
-                outcome=transacted(roll)
-                if outcome:
-                    entry['caught']=True
-        if not outcome:
-            await feedback(interaction,f'The {entry["species"]} escaped! One {ball} was used.')
-            return
-        cid,gold,earned,leveled=outcome
-        level_msg = f' Active creature gained {earned} EXP.'
-        if leveled:
-            level_msg += f' #{leveled[0]} gained {leveled[1]} level(s).'
-        msg=(f'{interaction.user.mention} caught **{entry["species"]}** (#{cid}, Lv. 5)! '
-             f'Traits: {", ".join(entry["traits"])}. Earned **{gold} Gold Coins**.'
-             +level_msg)
-        await feedback(interaction,msg,ephemeral=False)
-        if entry.get('message'):
+        # Acknowledge the dropdown immediately. Discord expires unacknowledged
+        # component interactions after roughly three seconds.
+        await interaction.response.defer(thinking=False)
+        try:
+            gid, uid = guild_only(interaction)
+            lock = spawn_locks.setdefault(gid, asyncio.Lock())
+            async with lock:
+                async with mutex:
+                    entry = spawns.get(gid)
+                    if not entry or entry['id'] != self.spawn_id or entry['caught']:
+                        await feedback(interaction, 'This wild creature is no longer available.')
+                        return
+                    ball = self.values[0]
+                    if item_count(gid, uid, ball) < 1:
+                        await feedback(interaction, f'You have no {ball}s left.')
+                        return
+
+                    def roll():
+                        change_item(gid, uid, ball, -1)
+                        success = random.random() < BALL_RATES[ball]
+                        if not success:
+                            return None
+                        cid = create_creature(gid, uid, entry['species'], entry['traits'], 5)
+                        gold = random.randint(1, 50)
+                        change_money(gid, uid, 'gold', gold)
+                        earned = random.randint(10, 100)
+                        leveled = give_catch_exp(gid, uid, earned)
+                        return cid, gold, earned, leveled
+
+                    outcome = transacted(roll)
+                    if outcome:
+                        entry['caught'] = True
+
+            if not outcome:
+                await feedback(interaction, f'The {entry["species"]} escaped! One {ball} was used.')
+                return
+            cid, gold, earned, leveled = outcome
+            level_msg = f' Active creature gained {earned} EXP.' if leveled else ''
+            if leveled and leveled[1]:
+                level_msg += f' #{leveled[0]} gained {leveled[1]} level(s).'
+            msg = (f'{interaction.user.mention} caught **{entry["species"]}** (#{cid}, Lv. 5)! '
+                   f'Traits: {", ".join(entry["traits"])}. Earned **{gold} Gold Coins**.'
+                   + level_msg)
+            await feedback(interaction, msg, ephemeral=False)
+            if entry.get('message'):
+                try:
+                    await entry['message'].edit(view=None)
+                except discord.HTTPException:
+                    pass
+        except Exception:
+            log.exception('Error processing Pokéball selection in guild %s', interaction.guild_id)
             try:
-                await entry['message'].edit(view=None)
+                await feedback(interaction, 'The catch encountered an error. Please check the Railway logs.')
             except discord.HTTPException:
-                pass
+                log.exception('Could not send Pokéball error response')
 
 
 class BallMenu(discord.ui.View):
