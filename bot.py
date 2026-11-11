@@ -39,6 +39,10 @@ ITEMS = {
 }
 ITEM_LOOKUP = {s.casefold(): s for s in ITEMS}
 BALL_RATES = {'Pokeball': 0.40, 'Great Ball': 0.60, 'Ultra Ball': 0.80}
+ART_TYPES = {'Headshot': 200, 'Halfbody': 500, 'Fullbody': 1000}
+ART_FINISH = {'Sketch': 0, 'Lined': 100, 'Loose colour': 150, 'Full colour': 200, 'Coloured lines / Lineless': 250}
+ART_SHADING = {'Unshaded': 0, 'Minimal shading': 200, 'Rendered': 500}
+ART_ANIMATED = {'FBF': 2000, 'Tweened': 500}
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('sunny')
 
@@ -89,18 +93,32 @@ def initialize() -> None:
     CREATE TABLE IF NOT EXISTS designs(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       guild INTEGER NOT NULL, creature_id INTEGER NOT NULL,
-      submitter INTEGER NOT NULL, submission_url TEXT NOT NULL,
+      submitter INTEGER NOT NULL, artist INTEGER, submission_url TEXT NOT NULL,
       attachment_url TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending'
         CHECK(status IN ('pending','approved','denied')),
       reviewer INTEGER, created_at INTEGER NOT NULL, reviewed_at INTEGER
     );
     CREATE INDEX IF NOT EXISTS designs_creature_lookup ON designs(guild,creature_id,status,id);
+    CREATE TABLE IF NOT EXISTS art_submissions(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      guild INTEGER NOT NULL, submitter INTEGER NOT NULL, artist INTEGER,
+      type1 TEXT NOT NULL, type2 TEXT, type3 TEXT,
+      finish TEXT NOT NULL, shading TEXT NOT NULL, animated TEXT,
+      total_gc INTEGER NOT NULL CHECK(total_gc>=0),
+      submission_url TEXT NOT NULL, attachment_url TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending'
+        CHECK(status IN ('pending','approved','denied')),
+      reviewer INTEGER, created_at INTEGER NOT NULL, reviewed_at INTEGER
+    );
     ''')
     cols={r['name'] for r in db.execute('PRAGMA table_info(creatures)').fetchall()}
     if 'exp' not in cols:
         db.execute('ALTER TABLE creatures ADD COLUMN exp INTEGER NOT NULL DEFAULT 0')
     if 'nickname' not in cols:
         db.execute('ALTER TABLE creatures ADD COLUMN nickname TEXT')
+    design_cols={r['name'] for r in db.execute('PRAGMA table_info(designs)').fetchall()}
+    if 'artist' not in design_cols:
+        db.execute('ALTER TABLE designs ADD COLUMN artist INTEGER')
 
 
 def userrow(guild: int, user: int) -> sqlite3.Row:
@@ -316,6 +334,33 @@ async def trait_autocomplete(interaction: discord.Interaction, current: str):
 
 async def item_autocomplete(interaction: discord.Interaction, current: str):
     return [app_commands.Choice(name=x,value=x) for x in ITEMS if current.casefold() in x.casefold()][:25]
+
+
+def validate_submission_image(image: discord.Attachment, label: str='image') -> None:
+    valid_type = image.content_type and image.content_type.lower().startswith('image/')
+    valid_extension = Path(image.filename).suffix.lower() in ('.png', '.jpg', '.jpeg', '.gif', '.webp')
+    if not (valid_type or valid_extension):
+        raise ValueError(f'Upload a PNG, JPG, GIF, or WebP {label}.')
+    if image.size > 10 * 1024 * 1024:
+        raise ValueError(f'{label.capitalize()} files must be 10 MB or smaller.')
+
+
+def calculate_art_total(type_names: list[str], finish: str, shading: str, animated: str | None) -> int:
+    total = sum(ART_TYPES[name] for name in type_names)
+    total += ART_FINISH[finish]
+    total += ART_SHADING[shading]
+    if animated:
+        total += ART_ANIMATED[animated]
+    return total
+
+
+def art_breakdown(type_names: list[str], finish: str, shading: str, animated: str | None) -> str:
+    bits = [f'{name} ({ART_TYPES[name]} GC)' for name in type_names]
+    bits.append(f'{finish} ({ART_FINISH[finish]} GC)')
+    bits.append(f'{shading} ({ART_SHADING[shading]} GC)')
+    if animated:
+        bits.append(f'{animated} ({ART_ANIMATED[animated]} GC)')
+    return ' + '.join(bits)
 
 
 class CatchSelect(discord.ui.Select):
@@ -651,43 +696,52 @@ async def nickname(interaction:discord.Interaction,id:int,name:app_commands.Rang
 design_group=app_commands.Group(name='design',description='Submit creature artwork and review submissions')
 
 @design_group.command(name='submit',description='Submit a design for one of your creatures.')
-async def design_submit(interaction:discord.Interaction,id:int,image:discord.Attachment):
+async def design_submit(interaction:discord.Interaction,id:int,image:discord.Attachment,artist:discord.Member|None=None):
     gid,uid=guild_only(interaction)
     if not interaction.channel or not hasattr(interaction.channel, 'send'):
         raise ValueError('Submit designs in a server text channel.')
-    valid_type=image.content_type and image.content_type.lower().startswith('image/')
-    valid_extension=Path(image.filename).suffix.lower() in ('.png','.jpg','.jpeg','.gif','.webp')
-    if not (valid_type or valid_extension):
-        raise ValueError('Upload a PNG, JPG, GIF, or WebP image.')
-    if image.size > 10*1024*1024:
-        raise ValueError('Design files must be 10 MB or smaller.')
+    validate_submission_image(image, 'design image')
+    if artist is not None and artist.bot:
+        raise ValueError('Artist must be a human server member.')
     async with mutex:
         c=own_creature(gid,uid,id)
         species=c['species']
+    reward_user = artist or interaction.user
     await interaction.response.defer(thinking=True)
-    # The user-uploaded attachment appears on the public submission message.
-    # A permanent message URL, rather than a short-lived attachment URL, is the inventory link.
-    posted=await interaction.channel.send(
+    header = (
         f'**Creature design submission** · #{id} {safe_discord_text(species)}\n'
-        f'Submitted by {interaction.user.mention} · Pending staff review',
+        f'Submitted by {interaction.user.mention}\n'
+        + (f'Artist: {artist.mention}\n' if artist else '')
+        + 'Pending staff review'
+    )
+    posted=await interaction.channel.send(
+        header,
         file=await image.to_file(),
-        allowed_mentions=discord.AllowedMentions.none())
+        allowed_mentions=discord.AllowedMentions(users=True, roles=False, everyone=False))
     try:
         async with mutex:
             def save():
                 own_creature(gid,uid,id)
-                cur=conn().execute('INSERT INTO designs(guild,creature_id,submitter,submission_url,attachment_url,status,created_at) VALUES(?,?,?,?,?,?,?)',
-                    (gid,id,uid,posted.jump_url,image.url,'pending',int(time.time())))
+                cur=conn().execute('INSERT INTO designs(guild,creature_id,submitter,artist,submission_url,attachment_url,status,created_at) VALUES(?,?,?,?,?,?,?,?)',
+                    (gid,id,uid,reward_user.id if artist else None,posted.jump_url,image.url,'pending',int(time.time())))
+                change_money(gid,reward_user.id,'gold',500)
+                change_money(gid,reward_user.id,'shards',1)
                 return cur.lastrowid
             did=transacted(save)
     except Exception:
         await posted.delete()
         raise
-    await posted.edit(content=(
+    public = (
         f'**Design #{did}** · Creature #{id} {safe_discord_text(species)}\n'
-        f'Submitted by {interaction.user.mention} · **PENDING** staff review'),
-        allowed_mentions=discord.AllowedMentions.none())
-    await interaction.followup.send(f'Design **#{did}** submitted for creature **#{id}**. Review: {posted.jump_url}')
+        f'Submitted by {interaction.user.mention}\n'
+        + (f'Artist: {artist.mention}\n' if artist else '')
+        + f'**PENDING** staff review\n'
+        + f'Reward granted to {reward_user.mention}: **500 Gold Coins** and **1 Diamond Shard**'
+    )
+    await posted.edit(content=public, allowed_mentions=discord.AllowedMentions(users=True, roles=False, everyone=False))
+    await interaction.followup.send(
+        f'Design **#{did}** submitted for creature **#{id}**. Reward granted to {reward_user.mention}: **500 Gold Coins** and **1 Diamond Shard**. Review: {posted.jump_url}',
+        allowed_mentions=discord.AllowedMentions(users=True, roles=False, everyone=False))
 
 
 @design_group.command(name='approve',description='Staff: approve a pending creature design.')
@@ -735,6 +789,115 @@ async def design_deny(interaction:discord.Interaction,design_id:int,reason:app_c
 
 
 bot.tree.add_command(design_group)
+
+
+art_group=app_commands.Group(name='art',description='Submit art for staff approval and payout')
+
+@art_group.command(name='submit',description='Submit art for approval and a currency payout.')
+@app_commands.choices(
+    type=[app_commands.Choice(name='Headshot',value='Headshot'),app_commands.Choice(name='Halfbody',value='Halfbody'),app_commands.Choice(name='Fullbody',value='Fullbody')],
+    type2=[app_commands.Choice(name='Headshot',value='Headshot'),app_commands.Choice(name='Halfbody',value='Halfbody'),app_commands.Choice(name='Fullbody',value='Fullbody')],
+    type3=[app_commands.Choice(name='Headshot',value='Headshot'),app_commands.Choice(name='Halfbody',value='Halfbody'),app_commands.Choice(name='Fullbody',value='Fullbody')],
+    finish=[app_commands.Choice(name='sketch',value='Sketch'),app_commands.Choice(name='lined',value='Lined'),app_commands.Choice(name='loose colour',value='Loose colour'),app_commands.Choice(name='full colour',value='Full colour'),app_commands.Choice(name='coloured lines / lineless',value='Coloured lines / Lineless')],
+    shading=[app_commands.Choice(name='unshaded',value='Unshaded'),app_commands.Choice(name='minimal shading',value='Minimal shading'),app_commands.Choice(name='rendered',value='Rendered')],
+    animated=[app_commands.Choice(name='fbf',value='FBF'),app_commands.Choice(name='tweened',value='Tweened')]
+)
+async def art_submit(interaction:discord.Interaction,
+                     image:discord.Attachment,
+                     type:app_commands.Choice[str],
+                     finish:app_commands.Choice[str],
+                     shading:app_commands.Choice[str],
+                     type2:app_commands.Choice[str]|None=None,
+                     type3:app_commands.Choice[str]|None=None,
+                     animated:app_commands.Choice[str]|None=None):
+    gid,uid=guild_only(interaction)
+    if not interaction.channel or not hasattr(interaction.channel, 'send'):
+        raise ValueError('Submit art in a server text channel.')
+    validate_submission_image(image, 'art image')
+    types=[type.value]
+    if type2: types.append(type2.value)
+    if type3: types.append(type3.value)
+    if len(set(types)) != len(types):
+        raise ValueError('TYPE, TYPE2, and TYPE3 must all be different.')
+    total=calculate_art_total(types, finish.value, shading.value, animated.value if animated else None)
+    breakdown=art_breakdown(types, finish.value, shading.value, animated.value if animated else None)
+    await interaction.response.defer(thinking=True)
+    posted=await interaction.channel.send(
+        f'**Art submission**\n'
+        f'Submitted by {interaction.user.mention}\n'
+        f'Breakdown: {breakdown}\n'
+        f'Total on approval: **{total:,} Gold Coins** and **{total//100:,} Diamond Shards**\n'
+        f'**PENDING** staff review',
+        file=await image.to_file(),
+        allowed_mentions=discord.AllowedMentions(users=True, roles=False, everyone=False))
+    try:
+        async with mutex:
+            def save():
+                cur=conn().execute('INSERT INTO art_submissions(guild,submitter,artist,type1,type2,type3,finish,shading,animated,total_gc,submission_url,attachment_url,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+                    (gid,uid,None,types[0],types[1] if len(types)>1 else None,types[2] if len(types)>2 else None,finish.value,shading.value,animated.value if animated else None,total,posted.jump_url,image.url,'pending',int(time.time())))
+                return cur.lastrowid
+            aid=transacted(save)
+    except Exception:
+        await posted.delete()
+        raise
+    await posted.edit(content=(
+        f'**Art #{aid}**\n'
+        f'Submitted by {interaction.user.mention}\n'
+        f'Breakdown: {breakdown}\n'
+        f'Total on approval: **{total:,} Gold Coins** and **{total//100:,} Diamond Shards**\n'
+        f'**PENDING** staff review'),
+        allowed_mentions=discord.AllowedMentions(users=True, roles=False, everyone=False))
+    await interaction.followup.send(
+        f'Art **#{aid}** submitted. Total on approval: **{total:,} Gold Coins** and **{total//100:,} Diamond Shards**. Review: {posted.jump_url}')
+
+
+@art_group.command(name='approve',description='Staff: approve a pending art submission and pay it out.')
+@app_commands.default_permissions(manage_guild=True)
+async def art_approve(interaction:discord.Interaction,art_id:int):
+    gid,_=guild_only(interaction)
+    admin_only(interaction)
+    async with mutex:
+        def approve():
+            a=conn().execute('SELECT * FROM art_submissions WHERE id=? AND guild=?',(art_id,gid)).fetchone()
+            if a is None:
+                raise ValueError('Art ID does not exist in this server.')
+            if a['status']!='pending':
+                raise ValueError(f'That art submission is already {a["status"]}.')
+            payout_gold=a['total_gc']
+            payout_shards=payout_gold // 100
+            change_money(gid,a['submitter'],'gold',payout_gold)
+            if payout_shards:
+                change_money(gid,a['submitter'],'shards',payout_shards)
+            conn().execute('UPDATE art_submissions SET status=?,reviewer=?,reviewed_at=? WHERE id=?',
+                ('approved',interaction.user.id,int(time.time()),art_id))
+            return a, payout_gold, payout_shards
+        a,payout_gold,payout_shards=transacted(approve)
+    await feedback(interaction,
+        f'Approved art **#{art_id}**. Paid <@{a["submitter"]}> **{payout_gold:,} Gold Coins** and **{payout_shards:,} Diamond Shards**.')
+
+
+@art_group.command(name='deny',description='Staff: deny a pending art submission.')
+@app_commands.default_permissions(manage_guild=True)
+async def art_deny(interaction:discord.Interaction,art_id:int,reason:app_commands.Range[str,1,250]|None=None):
+    gid,_=guild_only(interaction)
+    admin_only(interaction)
+    async with mutex:
+        def deny():
+            a=conn().execute('SELECT * FROM art_submissions WHERE id=? AND guild=?',(art_id,gid)).fetchone()
+            if a is None:
+                raise ValueError('Art ID does not exist in this server.')
+            if a['status']!='pending':
+                raise ValueError(f'That art submission is already {a["status"]}.')
+            conn().execute('UPDATE art_submissions SET status=?,reviewer=?,reviewed_at=? WHERE id=?',
+                ('denied',interaction.user.id,int(time.time()),art_id))
+            return a
+        a=transacted(deny)
+    message=f'Denied art **#{art_id}**.'
+    if reason:
+        message += f' Reason: {safe_discord_text(reason)}'
+    await feedback(interaction,message)
+
+bot.tree.add_command(art_group)
 
 
 @bot.tree.command(name='balance',description='View Gold Coins and Diamond Shards.')
@@ -935,10 +1098,10 @@ async def trade(interaction:discord.Interaction,user:discord.Member,
 @bot.tree.command(name='help_sunny',description='List Sunny the Junipyro commands.')
 async def help_sunny(interaction:discord.Interaction):
     await feedback(interaction,
-        '**Collect:** /active, /inventory creatures, /inventory items, /balance, /candy, /dice, /trait add, /nickname, /design submit\n'
+        '**Collect:** /active, /inventory creatures, /inventory items, /balance, /candy, /dice, /trait add, /nickname, /design submit, /art submit\n'
         '**Shop:** /shop view, /shop buy\n'
         '**Trade:** /trade\n'
-        '**Admin:** /spawnchannel, /spawnnow, /cspawn, /clevel, /cdelete, /giveitem, /takeitem, /givecurrency, /takecurrency, /design approve, /design deny\n'
+        '**Admin:** /spawnchannel, /spawnnow, /cspawn, /clevel, /cdelete, /giveitem, /takeitem, /givecurrency, /takecurrency, /design approve, /design deny, /art approve, /art deny\n'
         'Catches grant 1–50 Gold Coins and 10–100 EXP to your active creature. Wild catches enter your inventory at Lv. 5.',False)
 
 
