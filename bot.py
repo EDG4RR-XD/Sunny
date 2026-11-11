@@ -11,9 +11,7 @@ import re
 import sqlite3
 import time
 from pathlib import Path
-from urllib.parse import quote
 
-import aiohttp
 import discord
 from discord import app_commands
 from discord.ext import commands, tasks
@@ -41,11 +39,6 @@ ITEMS = {
 }
 ITEM_LOOKUP = {s.casefold(): s for s in ITEMS}
 BALL_RATES = {'Pokeball': 0.40, 'Great Ball': 0.60, 'Ultra Ball': 0.80}
-WIKIS = [
-    'pokemon.fandom.com', 'loomian-legacy.fandom.com', 'doodle-world.fandom.com',
-    'tales-of-tanorio.fandom.com', 'nexomon.fandom.com', 'coromon.fandom.com',
-    'temtem.fandom.com', 'cassette-beasts.fandom.com', 'beastie-ball.fandom.com',
-]
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('sunny')
 
@@ -54,7 +47,6 @@ intents.members = True  # Enables cleanup when members leave; enable this in Dev
 bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 db: sqlite3.Connection | None = None
 mutex = asyncio.Lock()
-http: aiohttp.ClientSession | None = None
 spawns: dict[int, dict] = {}
 spawn_locks: dict[int, asyncio.Lock] = {}
 
@@ -288,63 +280,6 @@ async def item_autocomplete(interaction: discord.Interaction, current: str):
     return [app_commands.Choice(name=x,value=x) for x in ITEMS if current.casefold() in x.casefold()][:25]
 
 
-async def wiki_image(species: str) -> tuple[str|None,str|None]:
-    now = int(time.time())
-    cached = conn().execute('SELECT * FROM image_cache WHERE species=?',(species,)).fetchone()
-    if cached and now-cached['checked'] < 7*86400:
-        return cached['image'],cached['wiki']
-    image_url, page_url = None, None
-    assert http is not None
-    # Search the relevant game's existing wiki and use its existing thumbnail.
-    # Explicit game-boundary hints speed up common results.
-    first = []
-    if CREATURES.index(species) <= CREATURES.index('Poltchageist'):
-        first = ['pokemon.fandom.com']
-    elif CREATURES.index(species) <= CREATURES.index('Staligant'):
-        first = ['doodle-world.fandom.com']
-    elif CREATURES.index(species) <= CREATURES.index('Senstruct'):
-        first = ['tales-of-tanorio.fandom.com']
-    domains = first + [w for w in WIKIS if w not in first]
-    for domain in domains:
-        try:
-            url = f'https://{domain}/api.php'
-            params = {'action':'query','generator':'search','gsrsearch':f'intitle:"{species}"',
-                      'gsrlimit':3,'prop':'pageimages|info','piprop':'thumbnail',
-                      'pithumbsize':500,'inprop':'url','format':'json','formatversion':2}
-            async with http.get(url,params=params,timeout=aiohttp.ClientTimeout(total=3.5)) as resp:
-                if resp.status!=200:
-                    continue
-                data=await resp.json(content_type=None)
-            pages=data.get('query',{}).get('pages',[])
-            if not isinstance(pages,list):
-                continue
-            for p in sorted(pages,key=lambda p:0 if p.get('title','').casefold()==species.casefold() else 1):
-                thumb=p.get('thumbnail',{}).get('source')
-                if thumb and p.get('title','').casefold().startswith(species.casefold()):
-                    image_url,page_url=thumb,p.get('fullurl')
-                    break
-            if image_url:
-                break
-        except (aiohttp.ClientError,asyncio.TimeoutError,ValueError,KeyError):
-            pass
-    # Official existing sprite fallback for Pokémon when wiki API is unavailable.
-    if not image_url and domains[0]=='pokemon.fandom.com':
-        slug = species.lower().replace('é','e').replace(' ','-').replace("'",'').replace('.','')
-        try:
-            async with http.get('https://pokeapi.co/api/v2/pokemon/'+quote(slug),timeout=aiohttp.ClientTimeout(total=4)) as resp:
-                if resp.status==200:
-                    data=await resp.json()
-                    image_url=(data.get('sprites',{}).get('other',{}).get('official-artwork',{}).get('front_default')
-                               or data.get('sprites',{}).get('front_default'))
-                    page_url=f'https://www.pokemon.com/us/pokedex/{quote(slug)}'
-        except (aiohttp.ClientError,asyncio.TimeoutError,ValueError):
-            pass
-    conn().execute('INSERT INTO image_cache(species,image,wiki,checked) VALUES(?,?,?,?) '
-                   'ON CONFLICT(species) DO UPDATE SET image=excluded.image,wiki=excluded.wiki,checked=excluded.checked',
-                   (species,image_url,page_url,now))
-    return image_url,page_url
-
-
 class CatchSelect(discord.ui.Select):
     def __init__(self,guild_id: int,spawn_id: int,counts: dict[str,int]):
         self.guild_id,self.spawn_id=guild_id,spawn_id
@@ -445,14 +380,7 @@ async def post_spawn(guild_id: int,channel_id: int) -> None:
                 pass
     species=random.choice(CREATURES)
     traits=roll_traits()
-    image,wiki=await wiki_image(species)
     embed=discord.Embed(title=f'Wild {species} appeared!',description='**Traits:** '+', '.join(traits)+'\n**Catch level:** 5\nUse **Catch!** to choose a ball.',color=discord.Color.orange())
-    if image:
-        embed.set_image(url=image)
-    else:
-        embed.add_field(name='Image unavailable',value='No matching existing wiki image was found.',inline=False)
-    if wiki:
-        embed.add_field(name='Creature wiki',value=f'[Source page]({wiki})',inline=False)
     token=random.getrandbits(63)
     message=await channel.send(embed=embed,view=CatchView(guild_id,token))
     spawns[guild_id]={'id':token,'species':species,'traits':traits,'caught':False,'message':message}
@@ -843,24 +771,20 @@ async def help_sunny(interaction:discord.Interaction):
 
 
 async def main():
-    global http
     if not TOKEN:
         raise SystemExit('Set DISCORD_TOKEN in .env or your host environment.')
     initialize()
-    timeout=aiohttp.ClientTimeout(total=8)
-    async with aiohttp.ClientSession(headers={'User-Agent':'SunnyJunipyroDiscordBot/1.0 (image attribution via source wiki)'},timeout=timeout) as session:
-        http=session
-        # sync once at startup, not once for every on_ready / gateway reconnect.
-        async def setup_hook():
-            if TEST_GUILD_ID:
-                guild=discord.Object(id=int(TEST_GUILD_ID))
-                bot.tree.copy_global_to(guild=guild)
-                await bot.tree.sync(guild=guild)
-            else:
-                await bot.tree.sync()
-            spawn_loop.start()
-        bot.setup_hook=setup_hook
-        await bot.start(TOKEN)
+    # sync once at startup, not once for every on_ready / gateway reconnect.
+    async def setup_hook():
+        if TEST_GUILD_ID:
+            guild=discord.Object(id=int(TEST_GUILD_ID))
+            bot.tree.copy_global_to(guild=guild)
+            await bot.tree.sync(guild=guild)
+        else:
+            await bot.tree.sync()
+        spawn_loop.start()
+    bot.setup_hook=setup_hook
+    await bot.start(TOKEN)
 
 
 if __name__=='__main__':

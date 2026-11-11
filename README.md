@@ -1,6 +1,6 @@
 # Sunny the Junipyro
 
-A Python 3.11+ Discord creature-collection bot using discord.py, aiohttp, and SQLite.
+A Python 3.11+ Discord creature-collection bot using discord.py and SQLite.
 
 ## Getting started
 
@@ -63,9 +63,9 @@ IDs start at 1 and are global across servers sharing the database. Deletions and
 
 `traits.json` has two groups. Admins can apply either group in `/cspawn`, with multiple traits separated by commas. Wild spawns roll only regular traits. Dice can roll a [NOSPAWN] trait with **0.2× the selection weight** of each regular trait; this implements “80% rarer” as 80% lower per-trait weight. Dice never add a duplicate trait. A brush can apply only a regular trait.
 
-## Existing creature imagery
+## Wild creature spawn display
 
-The bot tries the creature's game wiki using the wiki's MediaWiki API and uses an existing image when an accessible thumbnail is returned. Pokémon have an official-artwork/sprite fallback from PokéAPI. Wiki operators may block automated API requests, rename pages, or provide pages with no thumbnail. In those cases, the spawn still functions but shows an image-unavailable notice. Image lookups are cached for seven days in SQLite. No AI art or newly generated images are used.
+Wild spawns display the creature name, traits, catch level, and Catch button as a text-only embed. No image or image lookup failure message is displayed or requested.
 
 ## Editable catalogs
 
@@ -76,4 +76,4 @@ To add a species or trait, edit the corresponding file and restart the bot. To c
 
 ## Implementation notes
 
-The shop, catch, and trade use SQLite transactions with an async mutex to prevent duplicate claims and partial balance changes. Pending trades are kept in bot memory and expire after five minutes. If the bot restarts, any outstanding wild spawn button/trade request expires and the next scheduled spawn replaces the wild message. For a high-traffic production installation, consider durable spawn/trade state and a queue to decouple image fetching from spawning. Discord doesn't let bot developers grant permissions automatically, and a successful startup requires the correct Discord token, gateway intent, and channel permissions.
+The shop, catch, and trade use SQLite transactions with an async mutex to prevent duplicate claims and partial balance changes. Pending trades are kept in bot memory and expire after five minutes. If the bot restarts, any outstanding wild spawn button/trade request expires and the next scheduled spawn replaces the wild message. For a high-traffic production installation, consider durable spawn/trade state. Discord doesn't let bot developers grant permissions automatically, and a successful startup requires the correct Discord token, gateway intent, and channel permissions.
