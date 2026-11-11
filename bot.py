@@ -1,0 +1,867 @@
+"""Sunny the Junipyro: Discord creature collecting and trading bot."""
+from __future__ import annotations
+
+import asyncio
+import heapq
+import json
+import logging
+import os
+import random
+import re
+import sqlite3
+import time
+from pathlib import Path
+from urllib.parse import quote
+
+import aiohttp
+import discord
+from discord import app_commands
+from discord.ext import commands, tasks
+from dotenv import load_dotenv
+
+ROOT = Path(__file__).resolve().parent
+load_dotenv(ROOT / '.env')
+TOKEN = os.getenv('DISCORD_TOKEN', '')
+DB_PATH = os.getenv('DATABASE_PATH', str(ROOT / 'sunny.db'))
+TEST_GUILD_ID = os.getenv('TEST_GUILD_ID', '').strip()
+CREATURES = list(dict.fromkeys(line.strip() for line in (ROOT / 'creatures.txt').read_text(encoding='utf-8').splitlines() if line.strip()))
+TRAIT_DATA = json.loads((ROOT / 'traits.json').read_text(encoding='utf-8'))
+NORMAL_TRAITS = TRAIT_DATA['normal']
+NOSPAWN_TRAITS = TRAIT_DATA['nospawn']
+ALL_TRAITS = NORMAL_TRAITS + NOSPAWN_TRAITS
+CREATURE_LOOKUP = {s.casefold(): s for s in CREATURES}
+TRAIT_LOOKUP = {s.casefold(): s for s in ALL_TRAITS}
+ITEMS = {
+    'Rare Candy': {'gold': 500, 'shards': 2},
+    'Pokeball': {'gold': 100, 'shards': 1},
+    'Great Ball': {'gold': 300, 'shards': 2},
+    'Ultra Ball': {'gold': 600, 'shards': 4},
+    'Dice': {'gold': 1000, 'shards': 1},
+    'Trait Brush': {'gold': 1500, 'shards': 5},
+}
+ITEM_LOOKUP = {s.casefold(): s for s in ITEMS}
+BALL_RATES = {'Pokeball': 0.40, 'Great Ball': 0.60, 'Ultra Ball': 0.80}
+WIKIS = [
+    'pokemon.fandom.com', 'loomian-legacy.fandom.com', 'doodle-world.fandom.com',
+    'tales-of-tanorio.fandom.com', 'nexomon.fandom.com', 'coromon.fandom.com',
+    'temtem.fandom.com', 'cassette-beasts.fandom.com', 'beastie-ball.fandom.com',
+]
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger('sunny')
+
+intents = discord.Intents.default()
+intents.members = True  # Enables cleanup when members leave; enable this in Developer Portal too.
+bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
+db: sqlite3.Connection | None = None
+mutex = asyncio.Lock()
+http: aiohttp.ClientSession | None = None
+spawns: dict[int, dict] = {}
+spawn_locks: dict[int, asyncio.Lock] = {}
+
+
+def conn() -> sqlite3.Connection:
+    assert db is not None
+    return db
+
+
+def initialize() -> None:
+    global db
+    Path(DB_PATH).parent.mkdir(parents=True, exist_ok=True)
+    db = sqlite3.connect(DB_PATH, isolation_level=None)
+    db.row_factory = sqlite3.Row
+    db.execute('PRAGMA journal_mode=WAL')
+    db.execute('PRAGMA foreign_keys=ON')
+    db.executescript('''
+    CREATE TABLE IF NOT EXISTS config(guild INTEGER PRIMARY KEY, channel INTEGER);
+    CREATE TABLE IF NOT EXISTS users(
+      guild INTEGER NOT NULL, user INTEGER NOT NULL,
+      gold INTEGER NOT NULL DEFAULT 0 CHECK(gold>=0),
+      shards INTEGER NOT NULL DEFAULT 0 CHECK(shards>=0),
+      active_id INTEGER, exp INTEGER NOT NULL DEFAULT 0 CHECK(exp>=0),
+      PRIMARY KEY(guild,user)
+    );
+    CREATE TABLE IF NOT EXISTS items(
+      guild INTEGER NOT NULL, user INTEGER NOT NULL, name TEXT NOT NULL,
+      qty INTEGER NOT NULL CHECK(qty>=0), PRIMARY KEY(guild,user,name)
+    );
+    CREATE TABLE IF NOT EXISTS creatures(
+      id INTEGER PRIMARY KEY, guild INTEGER NOT NULL, owner INTEGER NOT NULL,
+      species TEXT NOT NULL, traits TEXT NOT NULL, level INTEGER NOT NULL CHECK(level>=1),
+      exp INTEGER NOT NULL DEFAULT 0 CHECK(exp>=0)
+    );
+    CREATE INDEX IF NOT EXISTS creature_owner ON creatures(guild,owner);
+    CREATE TABLE IF NOT EXISTS free_ids(id INTEGER PRIMARY KEY);
+    CREATE TABLE IF NOT EXISTS id_counter(key INTEGER PRIMARY KEY CHECK(key=1), next_id INTEGER NOT NULL);
+    INSERT OR IGNORE INTO id_counter(key,next_id) VALUES(1,1);
+    CREATE TABLE IF NOT EXISTS image_cache(species TEXT PRIMARY KEY, image TEXT, wiki TEXT, checked INTEGER NOT NULL);
+    ''')
+    cols={r['name'] for r in db.execute('PRAGMA table_info(creatures)').fetchall()}
+    if 'exp' not in cols:
+        db.execute('ALTER TABLE creatures ADD COLUMN exp INTEGER NOT NULL DEFAULT 0')
+
+
+def userrow(guild: int, user: int) -> sqlite3.Row:
+    conn().execute('INSERT OR IGNORE INTO users(guild,user) VALUES(?,?)', (guild, user))
+    return conn().execute('SELECT * FROM users WHERE guild=? AND user=?', (guild,user)).fetchone()
+
+
+def item_count(guild: int, user: int, name: str) -> int:
+    x = conn().execute('SELECT qty FROM items WHERE guild=? AND user=? AND name=?', (guild,user,name)).fetchone()
+    return x['qty'] if x else 0
+
+
+def change_item(guild: int, user: int, name: str, delta: int) -> None:
+    if item_count(guild,user,name) + delta < 0:
+        raise ValueError('Not enough ' + name + '.')
+    conn().execute('INSERT INTO items(guild,user,name,qty) VALUES(?,?,?,?) '
+                   'ON CONFLICT(guild,user,name) DO UPDATE SET qty=qty+excluded.qty',
+                   (guild,user,name,delta))
+    conn().execute('DELETE FROM items WHERE guild=? AND user=? AND name=? AND qty=0',(guild,user,name))
+
+
+def change_money(guild: int, user: int, column: str, delta: int) -> None:
+    if column not in ('gold','shards'):
+        raise ValueError('Invalid currency.')
+    r = userrow(guild,user)
+    if r[column]+delta < 0:
+        raise ValueError('Not enough currency.')
+    conn().execute(f'UPDATE users SET {column}={column}+? WHERE guild=? AND user=?',(delta,guild,user))
+
+
+def allocate_id() -> int:
+    free = conn().execute('SELECT id FROM free_ids ORDER BY id LIMIT 1').fetchone()
+    if free:
+        conn().execute('DELETE FROM free_ids WHERE id=?',(free['id'],))
+        return free['id']
+    nxt = conn().execute('SELECT next_id FROM id_counter WHERE key=1').fetchone()['next_id']
+    conn().execute('UPDATE id_counter SET next_id=? WHERE key=1',(nxt+1,))
+    return nxt
+
+
+def create_creature(guild: int, user: int, name: str, traits: list[str], level: int) -> int:
+    userrow(guild,user)
+    cid = allocate_id()
+    conn().execute('INSERT INTO creatures(id,guild,owner,species,traits,level) VALUES(?,?,?,?,?,?)',
+                   (cid,guild,user,name,json.dumps(traits),level))
+    return cid
+
+
+def delete_creature(cid: int) -> None:
+    c = conn().execute('SELECT * FROM creatures WHERE id=?',(cid,)).fetchone()
+    if c is None:
+        raise ValueError('Creature ID does not exist.')
+    conn().execute('UPDATE users SET active_id=NULL,exp=0 WHERE guild=? AND user=? AND active_id=?',
+                   (c['guild'],c['owner'],cid))
+    conn().execute('DELETE FROM creatures WHERE id=?',(cid,))
+    conn().execute('INSERT INTO free_ids(id) VALUES(?)',(cid,))
+
+
+def own_creature(guild: int, user: int, cid: int) -> sqlite3.Row:
+    c = conn().execute('SELECT * FROM creatures WHERE id=? AND guild=? AND owner=?',(cid,guild,user)).fetchone()
+    if not c:
+        raise ValueError('That creature ID is not in your inventory.')
+    return c
+
+
+def transfer_creature(cid: int, guild: int, sender: int, receiver: int) -> None:
+    own_creature(guild,sender,cid)
+    userrow(guild,receiver)
+    conn().execute('UPDATE users SET active_id=NULL,exp=0 WHERE guild=? AND user=? AND active_id=?',
+                   (guild,sender,cid))
+    conn().execute('UPDATE creatures SET owner=? WHERE id=?',(receiver,cid))
+
+
+def exp_needed(level: int) -> int:
+    # EXP storage is SQLite's signed 64-bit integer. At very high levels,
+    # 10 * 1.2 ** (level-1) is already beyond achievable saved EXP.
+    if level >= 250:
+        return 2**63
+    # ceil(10 * 1.2**(level-1)), calculated without floating-point error.
+    return (10 * pow(6,level-1) + pow(5,level-1)-1) // pow(5,level-1)
+
+
+def give_catch_exp(guild: int, user: int, exp: int) -> tuple[int,int] | None:
+    r = userrow(guild,user)
+    cid = r['active_id']
+    if cid is None:
+        return None
+    c = conn().execute('SELECT * FROM creatures WHERE id=? AND guild=? AND owner=?',(cid,guild,user)).fetchone()
+    if c is None:
+        conn().execute('UPDATE users SET active_id=NULL,exp=0 WHERE guild=? AND user=?',(guild,user))
+        return None
+    level = c['level']
+    pool = c['exp']+exp
+    raised = 0
+    while pool >= exp_needed(level):
+        pool -= exp_needed(level)
+        level += 1
+        raised += 1
+    conn().execute('UPDATE creatures SET level=?,exp=? WHERE id=?',(level,pool,cid))
+    return cid,raised
+
+
+def canonical_creature(s: str) -> str:
+    c = CREATURE_LOOKUP.get(s.strip().casefold())
+    if c is None:
+        raise ValueError('Creature is not in creatures.txt.')
+    return c
+
+
+def parse_traits(s: str, allow_nospawn: bool=True) -> list[str]:
+    vals = [x.strip() for x in re.split(r'[,;\n]+',s) if x.strip()]
+    if not vals:
+        raise ValueError('Specify at least one trait.')
+    result = []
+    for val in vals:
+        t = TRAIT_LOOKUP.get(val.casefold())
+        if not t:
+            raise ValueError(f'Unknown trait: {val}')
+        if not allow_nospawn and t in NOSPAWN_TRAITS:
+            raise ValueError(f'{t} is [NOSPAWN].')
+        if t in result:
+            raise ValueError('A creature cannot have the same trait twice.')
+        result.append(t)
+    return result
+
+
+def roll_traits() -> list[str]:
+    # 1 to 3 distinct spawnable traits. Basic is allowed as given in the list.
+    return random.sample(NORMAL_TRAITS, random.randint(1,3))
+
+
+def roll_die_trait(existing: list[str]) -> str | None:
+    pool = [t for t in NORMAL_TRAITS if t not in existing] + [t for t in NOSPAWN_TRAITS if t not in existing]
+    if not pool:
+        return None
+    # '80% rarer' interpreted as weight 0.2 for each NOSPAWN trait.
+    return random.choices(pool, weights=[0.2 if t in NOSPAWN_TRAITS else 1.0 for t in pool],k=1)[0]
+
+
+def fmt_c(c: sqlite3.Row) -> str:
+    return f"**#{c['id']} {c['species']}** · Lv. {c['level']} · {', '.join(json.loads(c['traits']))}"
+
+
+def transacted(fn):
+    """Use only within mutex; rollback on error."""
+    conn().execute('BEGIN IMMEDIATE')
+    try:
+        result = fn()
+        conn().execute('COMMIT')
+        return result
+    except BaseException:
+        conn().execute('ROLLBACK')
+        raise
+
+
+async def feedback(interaction: discord.Interaction, message: str, ephemeral: bool=True) -> None:
+    if interaction.response.is_done():
+        await interaction.followup.send(message, ephemeral=ephemeral)
+    else:
+        await interaction.response.send_message(message, ephemeral=ephemeral)
+
+
+def guild_only(interaction: discord.Interaction) -> tuple[int,int]:
+    if not interaction.guild_id:
+        raise ValueError('Use this command in a server.')
+    return interaction.guild_id,interaction.user.id
+
+
+def admin_only(interaction: discord.Interaction) -> None:
+    if not isinstance(interaction.user,discord.Member) or not interaction.user.guild_permissions.manage_guild:
+        raise ValueError('Manage Server permission is required.')
+
+
+async def creature_autocomplete(interaction: discord.Interaction, current: str):
+    q = current.casefold()
+    names = [x for x in CREATURES if x.casefold().startswith(q)]
+    if len(names)<25:
+        names.extend(x for x in CREATURES if q in x.casefold() and x not in names)
+    return [app_commands.Choice(name=x,value=x) for x in names[:25]]
+
+
+async def trait_autocomplete(interaction: discord.Interaction, current: str):
+    q = current.casefold()
+    return [app_commands.Choice(name=x,value=x) for x in ALL_TRAITS if q in x.casefold()][:25]
+
+
+async def item_autocomplete(interaction: discord.Interaction, current: str):
+    return [app_commands.Choice(name=x,value=x) for x in ITEMS if current.casefold() in x.casefold()][:25]
+
+
+async def wiki_image(species: str) -> tuple[str|None,str|None]:
+    now = int(time.time())
+    cached = conn().execute('SELECT * FROM image_cache WHERE species=?',(species,)).fetchone()
+    if cached and now-cached['checked'] < 7*86400:
+        return cached['image'],cached['wiki']
+    image_url, page_url = None, None
+    assert http is not None
+    # Search the relevant game's existing wiki and use its existing thumbnail.
+    # Explicit game-boundary hints speed up common results.
+    first = []
+    if CREATURES.index(species) <= CREATURES.index('Poltchageist'):
+        first = ['pokemon.fandom.com']
+    elif CREATURES.index(species) <= CREATURES.index('Staligant'):
+        first = ['doodle-world.fandom.com']
+    elif CREATURES.index(species) <= CREATURES.index('Senstruct'):
+        first = ['tales-of-tanorio.fandom.com']
+    domains = first + [w for w in WIKIS if w not in first]
+    for domain in domains:
+        try:
+            url = f'https://{domain}/api.php'
+            params = {'action':'query','generator':'search','gsrsearch':f'intitle:"{species}"',
+                      'gsrlimit':3,'prop':'pageimages|info','piprop':'thumbnail',
+                      'pithumbsize':500,'inprop':'url','format':'json','formatversion':2}
+            async with http.get(url,params=params,timeout=aiohttp.ClientTimeout(total=3.5)) as resp:
+                if resp.status!=200:
+                    continue
+                data=await resp.json(content_type=None)
+            pages=data.get('query',{}).get('pages',[])
+            if not isinstance(pages,list):
+                continue
+            for p in sorted(pages,key=lambda p:0 if p.get('title','').casefold()==species.casefold() else 1):
+                thumb=p.get('thumbnail',{}).get('source')
+                if thumb and p.get('title','').casefold().startswith(species.casefold()):
+                    image_url,page_url=thumb,p.get('fullurl')
+                    break
+            if image_url:
+                break
+        except (aiohttp.ClientError,asyncio.TimeoutError,ValueError,KeyError):
+            pass
+    # Official existing sprite fallback for Pokémon when wiki API is unavailable.
+    if not image_url and domains[0]=='pokemon.fandom.com':
+        slug = species.lower().replace('é','e').replace(' ','-').replace("'",'').replace('.','')
+        try:
+            async with http.get('https://pokeapi.co/api/v2/pokemon/'+quote(slug),timeout=aiohttp.ClientTimeout(total=4)) as resp:
+                if resp.status==200:
+                    data=await resp.json()
+                    image_url=(data.get('sprites',{}).get('other',{}).get('official-artwork',{}).get('front_default')
+                               or data.get('sprites',{}).get('front_default'))
+                    page_url=f'https://www.pokemon.com/us/pokedex/{quote(slug)}'
+        except (aiohttp.ClientError,asyncio.TimeoutError,ValueError):
+            pass
+    conn().execute('INSERT INTO image_cache(species,image,wiki,checked) VALUES(?,?,?,?) '
+                   'ON CONFLICT(species) DO UPDATE SET image=excluded.image,wiki=excluded.wiki,checked=excluded.checked',
+                   (species,image_url,page_url,now))
+    return image_url,page_url
+
+
+class CatchSelect(discord.ui.Select):
+    def __init__(self,guild_id: int,spawn_id: int,counts: dict[str,int]):
+        self.guild_id,self.spawn_id=guild_id,spawn_id
+        opts=[discord.SelectOption(label=k,description=f'{int(v*100)}% chance · owned: {counts[k]}',value=k)
+              for k,v in BALL_RATES.items() if counts[k]>0]
+        super().__init__(placeholder='Choose a Pokéball',min_values=1,max_values=1,options=opts)
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        gid,uid=guild_only(interaction)
+        lock=spawn_locks.setdefault(gid,asyncio.Lock())
+        async with lock:
+            async with mutex:
+                entry=spawns.get(gid)
+                if not entry or entry['id'] != self.spawn_id or entry['caught']:
+                    await feedback(interaction,'This wild creature is no longer available.')
+                    return
+                ball=self.values[0]
+                if item_count(gid,uid,ball)<1:
+                    await feedback(interaction,f'You have no {ball}s left.')
+                    return
+                def roll():
+                    change_item(gid,uid,ball,-1)
+                    success=random.random()<BALL_RATES[ball]
+                    if not success:
+                        return None
+                    cid=create_creature(gid,uid,entry['species'],entry['traits'],5)
+                    gold=random.randint(1,50)
+                    change_money(gid,uid,'gold',gold)
+                    earned=random.randint(10,100)
+                    leveled=give_catch_exp(gid,uid,earned)
+                    return cid,gold,earned,leveled
+                outcome=transacted(roll)
+                if outcome:
+                    entry['caught']=True
+        if not outcome:
+            await feedback(interaction,f'The {entry["species"]} escaped! One {ball} was used.')
+            return
+        cid,gold,earned,leveled=outcome
+        level_msg = f' Active creature gained {earned} EXP.'
+        if leveled:
+            level_msg += f' #{leveled[0]} gained {leveled[1]} level(s).'
+        msg=(f'{interaction.user.mention} caught **{entry["species"]}** (#{cid}, Lv. 5)! '
+             f'Traits: {", ".join(entry["traits"])}. Earned **{gold} Gold Coins**.'
+             +level_msg)
+        await feedback(interaction,msg,ephemeral=False)
+        if entry.get('message'):
+            try:
+                await entry['message'].edit(view=None)
+            except discord.HTTPException:
+                pass
+
+
+class BallMenu(discord.ui.View):
+    def __init__(self,guild_id: int,spawn_id: int,counts: dict[str,int]):
+        super().__init__(timeout=90)
+        self.add_item(CatchSelect(guild_id,spawn_id,counts))
+
+
+class CatchView(discord.ui.View):
+    def __init__(self,guild_id: int,spawn_id: int):
+        super().__init__(timeout=None)
+        self.guild_id,self.spawn_id=guild_id,spawn_id
+
+    @discord.ui.button(label='Catch!',style=discord.ButtonStyle.success,custom_id='sunny:catch')
+    async def catch(self,interaction: discord.Interaction,button: discord.ui.Button):
+        gid,uid=guild_only(interaction)
+        if gid!=self.guild_id or not spawns.get(gid) or spawns[gid]['id']!=self.spawn_id or spawns[gid]['caught']:
+            await feedback(interaction,'This spawn has expired.')
+            return
+        async with mutex:
+            counts={k:item_count(gid,uid,k) for k in BALL_RATES}
+        if not any(counts.values()):
+            await feedback(interaction,'You need a ball. Purchase one with /shop buy.')
+            return
+        await interaction.response.send_message('Select a ball to throw:',view=BallMenu(gid,self.spawn_id,counts),ephemeral=True)
+
+
+async def post_spawn(guild_id: int,channel_id: int) -> None:
+    channel=bot.get_channel(channel_id)
+    if channel is None:
+        try:
+            channel=await bot.fetch_channel(channel_id)
+        except (discord.NotFound,discord.Forbidden,discord.HTTPException):
+            return
+    if not hasattr(channel,'send'):
+        return
+    old=spawns.pop(guild_id,None)
+    if old and old.get('message'):
+        if not old.get('caught'):
+            try:
+                await old['message'].delete()
+            except discord.HTTPException:
+                pass
+        else:
+            try:
+                await old['message'].edit(view=None)
+            except discord.HTTPException:
+                pass
+    species=random.choice(CREATURES)
+    traits=roll_traits()
+    image,wiki=await wiki_image(species)
+    embed=discord.Embed(title=f'Wild {species} appeared!',description='**Traits:** '+', '.join(traits)+'\n**Catch level:** 5\nUse **Catch!** to choose a ball.',color=discord.Color.orange())
+    if image:
+        embed.set_image(url=image)
+    else:
+        embed.add_field(name='Image unavailable',value='No matching existing wiki image was found.',inline=False)
+    if wiki:
+        embed.add_field(name='Creature wiki',value=f'[Source page]({wiki})',inline=False)
+    token=random.getrandbits(63)
+    message=await channel.send(embed=embed,view=CatchView(guild_id,token))
+    spawns[guild_id]={'id':token,'species':species,'traits':traits,'caught':False,'message':message}
+
+
+@tasks.loop(minutes=5)
+async def spawn_loop():
+    rows=conn().execute('SELECT * FROM config WHERE channel IS NOT NULL').fetchall()
+    for config in rows:
+        try:
+            await post_spawn(config['guild'],config['channel'])
+        except (discord.HTTPException,ValueError,sqlite3.Error):
+            log.exception('Unable to spawn in guild %s',config['guild'])
+
+
+@spawn_loop.before_loop
+async def before_spawn():
+    await bot.wait_until_ready()
+
+
+@bot.event
+async def on_ready():
+    log.info('Logged in as %s',bot.user)
+
+
+@bot.event
+async def on_member_remove(member:discord.Member):
+    async with mutex:
+        def clear():
+            rows=conn().execute('SELECT id FROM creatures WHERE guild=? AND owner=?',(member.guild.id,member.id)).fetchall()
+            for row in rows:
+                delete_creature(row['id'])
+            conn().execute('DELETE FROM items WHERE guild=? AND user=?',(member.guild.id,member.id))
+            conn().execute('DELETE FROM users WHERE guild=? AND user=?',(member.guild.id,member.id))
+        transacted(clear)
+
+
+@bot.tree.error
+async def command_error(interaction:discord.Interaction,error:app_commands.AppCommandError):
+    if isinstance(error,app_commands.CommandInvokeError):
+        root=error.original
+    else:
+        root=error
+    if isinstance(root,ValueError):
+        await feedback(interaction,str(root))
+    else:
+        log.exception('Slash command failed',exc_info=error)
+        await feedback(interaction,'An error occurred. Please contact a server admin.')
+
+
+@bot.tree.command(name='spawnchannel',description='Admin: set the channel for five-minute wild creature spawns.')
+@app_commands.default_permissions(manage_guild=True)
+async def spawnchannel(interaction:discord.Interaction,channel:discord.TextChannel):
+    admin_only(interaction)
+    gid,_=guild_only(interaction)
+    async with mutex:
+        conn().execute('INSERT INTO config(guild,channel) VALUES(?,?) ON CONFLICT(guild) DO UPDATE SET channel=excluded.channel',(gid,channel.id))
+    await feedback(interaction,f'Wild creatures will spawn in {channel.mention} every 5 minutes.')
+
+
+@bot.tree.command(name='spawnnow',description='Admin: immediately spawn one wild creature in the configured channel.')
+@app_commands.default_permissions(manage_guild=True)
+async def spawnnow(interaction:discord.Interaction):
+    admin_only(interaction)
+    gid,_=guild_only(interaction)
+    row=conn().execute('SELECT channel FROM config WHERE guild=?',(gid,)).fetchone()
+    if not row:
+        raise ValueError('Set /spawnchannel first.')
+    await interaction.response.defer(ephemeral=True,thinking=True)
+    await post_spawn(gid,row['channel'])
+    await feedback(interaction,'Wild creature spawned.')
+
+
+@bot.tree.command(name='cspawn',description='Admin: grant a creature and any comma-separated traits.')
+@app_commands.default_permissions(manage_guild=True)
+@app_commands.autocomplete(creature=creature_autocomplete)
+async def cspawn(interaction:discord.Interaction,creature:str,user:discord.Member,traits:str,level:app_commands.Range[int,1,1000000]=1):
+    admin_only(interaction)
+    gid,_=guild_only(interaction)
+    creature=canonical_creature(creature)
+    trait_list=parse_traits(traits)
+    async with mutex:
+        cid=transacted(lambda:create_creature(gid,user.id,creature,trait_list,level))
+    await feedback(interaction,f'Added **{creature}** #{cid} at Lv. {level} to {user.mention}. Traits: {", ".join(trait_list)}.',False)
+
+
+@bot.tree.command(name='clevel',description='Admin: add levels to a creature without replacing its level.')
+@app_commands.default_permissions(manage_guild=True)
+async def clevel(interaction:discord.Interaction,creature_id:int,levels_to_add:app_commands.Range[int,1,1000000]):
+    admin_only(interaction)
+    gid,_=guild_only(interaction)
+    async with mutex:
+        c=conn().execute('SELECT * FROM creatures WHERE id=? AND guild=?',(creature_id,gid)).fetchone()
+        if not c:
+            raise ValueError('Creature ID not found in this server.')
+        conn().execute('UPDATE creatures SET level=level+? WHERE id=?',(levels_to_add,creature_id))
+    await feedback(interaction,f'#{creature_id} gained {levels_to_add} levels. Now Lv. {c["level"]+levels_to_add}.',False)
+
+
+@bot.tree.command(name='cdelete',description='Admin: permanently remove a creature, freeing its ID.')
+@app_commands.default_permissions(manage_guild=True)
+async def cdelete(interaction:discord.Interaction,creature_id:int):
+    admin_only(interaction)
+    gid,_=guild_only(interaction)
+    async with mutex:
+        c=conn().execute('SELECT * FROM creatures WHERE id=? AND guild=?',(creature_id,gid)).fetchone()
+        if not c:
+            raise ValueError('Creature ID not found in this server.')
+        transacted(lambda:delete_creature(creature_id))
+    await feedback(interaction,f'Deleted #{creature_id}. Its ID can now be reused.',False)
+
+
+@bot.tree.command(name='active',description='Choose your active creature to receive EXP from successful catches.')
+async def active(interaction:discord.Interaction,id:int):
+    gid,uid=guild_only(interaction)
+    async with mutex:
+        c=own_creature(gid,uid,id)
+        userrow(gid,uid)
+        conn().execute('UPDATE users SET active_id=? WHERE guild=? AND user=?',(id,gid,uid))
+    await feedback(interaction,f'#{id} {c["species"]} is now active. EXP: {c["exp"]}/{exp_needed(c["level"])}.')
+
+
+@bot.tree.command(name='candy',description='Use Rare Candies to raise your creature level.')
+async def candy(interaction:discord.Interaction,id:int,quantity:app_commands.Range[int,1,100000]=1):
+    gid,uid=guild_only(interaction)
+    async with mutex:
+        def use():
+            c=own_creature(gid,uid,id)
+            change_item(gid,uid,'Rare Candy',-quantity)
+            conn().execute('UPDATE creatures SET level=level+? WHERE id=?',(quantity,id))
+            return c['level']+quantity
+        result=transacted(use)
+    await feedback(interaction,f'#{id} used {quantity} Rare Candy(s). Now Lv. {result}.')
+
+
+@bot.tree.command(name='dice',description='Use one Dice to add a randomly selected new trait.')
+async def dice(interaction:discord.Interaction,id:int):
+    gid,uid=guild_only(interaction)
+    async with mutex:
+        def use():
+            c=own_creature(gid,uid,id)
+            traits=json.loads(c['traits'])
+            rolled=roll_die_trait(traits)
+            if not rolled:
+                raise ValueError('This creature already has every available trait.')
+            change_item(gid,uid,'Dice',-1)
+            traits.append(rolled)
+            conn().execute('UPDATE creatures SET traits=? WHERE id=?',(json.dumps(traits),id))
+            return rolled
+        result=transacted(use)
+    await feedback(interaction,f'#{id} gained **{result}**!')
+
+
+trait_group=app_commands.Group(name='trait',description='Creature trait commands')
+@trait_group.command(name='add',description='Use one Trait Brush to apply a spawnable trait to a creature.')
+@app_commands.autocomplete(trait=trait_autocomplete)
+async def trait_add(interaction:discord.Interaction,id:int,trait:str):
+    gid,uid=guild_only(interaction)
+    wanted=parse_traits(trait,allow_nospawn=False)
+    if len(wanted)!=1:
+        raise ValueError('Apply one trait per brush.')
+    async with mutex:
+        def use():
+            c=own_creature(gid,uid,id)
+            traits=json.loads(c['traits'])
+            if wanted[0] in traits:
+                raise ValueError('That creature already has this trait.')
+            change_item(gid,uid,'Trait Brush',-1)
+            traits.append(wanted[0])
+            conn().execute('UPDATE creatures SET traits=? WHERE id=?',(json.dumps(traits),id))
+        transacted(use)
+    await feedback(interaction,f'Added **{wanted[0]}** to creature #{id}.')
+bot.tree.add_command(trait_group)
+
+
+@bot.tree.command(name='creature',description='View an owned creature and its current EXP progress.')
+async def creature_info(interaction:discord.Interaction,id:int):
+    gid,uid=guild_only(interaction)
+    async with mutex:
+        c=own_creature(gid,uid,id)
+        current=userrow(gid,uid)['active_id']
+    await feedback(interaction,fmt_c(c)+f'\nEXP: {c["exp"]:,}/{exp_needed(c["level"]):,}' + (' · **ACTIVE**' if id==current else ''))
+
+
+@bot.tree.command(name='balance',description='View Gold Coins and Diamond Shards.')
+async def balance(interaction:discord.Interaction,user:discord.Member|None=None):
+    gid,uid=guild_only(interaction)
+    owner=user or interaction.user
+    async with mutex:
+        r=userrow(gid,owner.id)
+    await feedback(interaction,f'**{owner.display_name}** · {r["gold"]:,} Gold Coins · {r["shards"]:,} Diamond Shards',False)
+
+
+inventory_group=app_commands.Group(name='inventory',description='View your inventories')
+@inventory_group.command(name='items',description='Show item inventory.')
+async def inventory_items(interaction:discord.Interaction,user:discord.Member|None=None):
+    gid,uid=guild_only(interaction)
+    owner=user or interaction.user
+    async with mutex:
+        rows=conn().execute('SELECT name,qty FROM items WHERE guild=? AND user=? ORDER BY name',(gid,owner.id)).fetchall()
+    await feedback(interaction,f'**{owner.display_name} · Items**\n'+('\n'.join(f'{r["name"]}: {r["qty"]}' for r in rows) or 'No items.'),False)
+
+@inventory_group.command(name='creatures',description='Show a page of creature inventory, sorted by unique ID.')
+async def inventory_creatures(interaction:discord.Interaction,user:discord.Member|None=None,page:app_commands.Range[int,1,100000]=1):
+    gid,uid=guild_only(interaction)
+    owner=user or interaction.user
+    async with mutex:
+        rows=conn().execute('SELECT * FROM creatures WHERE guild=? AND owner=? ORDER BY id LIMIT 10 OFFSET ?', (gid,owner.id,(page-1)*10)).fetchall()
+        total=conn().execute('SELECT count(*) AS n FROM creatures WHERE guild=? AND owner=?',(gid,owner.id)).fetchone()['n']
+        active_id=userrow(gid,owner.id)['active_id']
+    if total and not rows:
+        raise ValueError('Page is beyond the end of the inventory.')
+    lines=[fmt_c(r)+(' · **ACTIVE**' if r['id']==active_id else '') for r in rows]
+    await feedback(interaction,f'**{owner.display_name} · Creatures** ({total} total, page {page})\n'+('\n'.join(lines) or 'No creatures.'),False)
+bot.tree.add_command(inventory_group)
+
+
+shop_group=app_commands.Group(name='shop',description='Buy helpful creature items')
+@shop_group.command(name='view',description='See shop prices.')
+async def shop_view(interaction:discord.Interaction):
+    lines=[f'**{item}**: {cost["gold"]:,} Gold Coins OR {cost["shards"]} Diamond Shards' for item,cost in ITEMS.items()]
+    await feedback(interaction,'**Sunny’s Shop**\n'+'\n'.join(lines),False)
+
+@shop_group.command(name='buy',description='Buy one or more items with one currency.')
+@app_commands.autocomplete(item=item_autocomplete)
+@app_commands.choices(currency=[app_commands.Choice(name='Gold Coins',value='gold'),app_commands.Choice(name='Diamond Shards',value='shards')])
+async def shop_buy(interaction:discord.Interaction,item:str,currency:app_commands.Choice[str],quantity:app_commands.Range[int,1,100000]=1):
+    gid,uid=guild_only(interaction)
+    item=ITEM_LOOKUP.get(item.casefold().strip())
+    if not item:
+        raise ValueError('That item is not available in the shop.')
+    price=ITEMS[item][currency.value]*quantity
+    async with mutex:
+        def buy():
+            change_money(gid,uid,currency.value,-price)
+            change_item(gid,uid,item,quantity)
+        transacted(buy)
+    await feedback(interaction,f'Purchased {quantity}× {item} for {price:,} {"Gold Coins" if currency.value=="gold" else "Diamond Shards"}.')
+bot.tree.add_command(shop_group)
+
+
+@bot.tree.command(name='giveitem',description='Admin: grant items to a user.')
+@app_commands.default_permissions(manage_guild=True)
+@app_commands.autocomplete(item=item_autocomplete)
+async def giveitem(interaction:discord.Interaction,user:discord.Member,item:str,quantity:app_commands.Range[int,1,1000000]=1):
+    admin_only(interaction)
+    gid,_=guild_only(interaction)
+    name=ITEM_LOOKUP.get(item.casefold().strip())
+    if not name:
+        raise ValueError('Unknown item.')
+    async with mutex:
+        transacted(lambda:change_item(gid,user.id,name,quantity))
+    await feedback(interaction,f'Granted {quantity}× {name} to {user.mention}.',False)
+
+
+@bot.tree.command(name='takeitem',description='Admin: take items from a user.')
+@app_commands.default_permissions(manage_guild=True)
+@app_commands.autocomplete(item=item_autocomplete)
+async def takeitem(interaction:discord.Interaction,user:discord.Member,item:str,quantity:app_commands.Range[int,1,1000000]=1):
+    admin_only(interaction)
+    gid,_=guild_only(interaction)
+    name=ITEM_LOOKUP.get(item.casefold().strip())
+    if not name:
+        raise ValueError('Unknown item.')
+    async with mutex:
+        transacted(lambda:change_item(gid,user.id,name,-quantity))
+    await feedback(interaction,f'Removed {quantity}× {name} from {user.mention}.',False)
+
+
+@bot.tree.command(name='givecurrency',description='Admin: grant Gold Coins or Diamond Shards.')
+@app_commands.default_permissions(manage_guild=True)
+@app_commands.choices(currency=[app_commands.Choice(name='Gold Coins',value='gold'),app_commands.Choice(name='Diamond Shards',value='shards')])
+async def givecurrency(interaction:discord.Interaction,user:discord.Member,currency:app_commands.Choice[str],amount:app_commands.Range[int,1,1000000000]):
+    admin_only(interaction)
+    gid,_=guild_only(interaction)
+    async with mutex:
+        transacted(lambda:change_money(gid,user.id,currency.value,amount))
+    await feedback(interaction,f'Granted {amount:,} {currency.name} to {user.mention}.',False)
+
+
+@bot.tree.command(name='takecurrency',description='Admin: take Gold Coins or Diamond Shards.')
+@app_commands.default_permissions(manage_guild=True)
+@app_commands.choices(currency=[app_commands.Choice(name='Gold Coins',value='gold'),app_commands.Choice(name='Diamond Shards',value='shards')])
+async def takecurrency(interaction:discord.Interaction,user:discord.Member,currency:app_commands.Choice[str],amount:app_commands.Range[int,1,1000000000]):
+    admin_only(interaction)
+    gid,_=guild_only(interaction)
+    async with mutex:
+        transacted(lambda:change_money(gid,user.id,currency.value,-amount))
+    await feedback(interaction,f'Took {amount:,} {currency.name} from {user.mention}.',False)
+
+
+class TradeView(discord.ui.View):
+    def __init__(self,guild:int,sender:int,receiver:int,give_c:int|None,want_c:int|None,
+                 give_item:str|None,want_item:str|None,give_qty:int,want_qty:int,
+                 give_gold:int,want_gold:int,give_shards:int,want_shards:int):
+        super().__init__(timeout=300)
+        self.details=(guild,sender,receiver,give_c,want_c,give_item,want_item,give_qty,want_qty,give_gold,want_gold,give_shards,want_shards)
+
+    @discord.ui.button(label='Accept Trade',style=discord.ButtonStyle.success)
+    async def accept(self,interaction:discord.Interaction,button:discord.ui.Button):
+        gid,sender,receiver,gc,wc,gi,wi,gq,wq,gg,wg,gs,ws=self.details
+        if interaction.user.id != receiver or interaction.guild_id != gid:
+            await feedback(interaction,'Only the receiving user can accept this trade.')
+            return
+        async with mutex:
+            def execute():
+                if gc: own_creature(gid,sender,gc)
+                if wc: own_creature(gid,receiver,wc)
+                # Validate all balances before any mutation; transaction protects atomicity.
+                for user,item,qty in [(sender,gi,gq),(receiver,wi,wq)]:
+                    if item and item_count(gid,user,item)<qty:
+                        raise ValueError('An offered item is no longer available.')
+                for user,col,value in [(sender,'gold',gg),(receiver,'gold',wg),(sender,'shards',gs),(receiver,'shards',ws)]:
+                    if userrow(gid,user)[col]<value:
+                        raise ValueError('An offered currency amount is no longer available.')
+                if gc: transfer_creature(gc,gid,sender,receiver)
+                if wc: transfer_creature(wc,gid,receiver,sender)
+                if gi: change_item(gid,sender,gi,-gq); change_item(gid,receiver,gi,gq)
+                if wi: change_item(gid,receiver,wi,-wq); change_item(gid,sender,wi,wq)
+                for col,a,b in [('gold',gg,wg),('shards',gs,ws)]:
+                    change_money(gid,sender,col,-a)
+                    change_money(gid,receiver,col,a)
+                    change_money(gid,receiver,col,-b)
+                    change_money(gid,sender,col,b)
+            try:
+                transacted(execute)
+            except ValueError as e:
+                await feedback(interaction,str(e))
+                return
+        self.stop()
+        await interaction.response.edit_message(content=f'Trade completed between <@{sender}> and <@{receiver}>.',view=None)
+
+    @discord.ui.button(label='Decline',style=discord.ButtonStyle.secondary)
+    async def decline(self,interaction:discord.Interaction,button:discord.ui.Button):
+        _,sender,receiver,*_=self.details
+        if interaction.user.id not in (sender,receiver):
+            await feedback(interaction,'Only the trade participants can decline.')
+            return
+        self.stop()
+        await interaction.response.edit_message(content='Trade declined.',view=None)
+
+
+@bot.tree.command(name='trade',description='Offer creature, item and/or currency in exchange for another user’s goods.')
+@app_commands.autocomplete(give_item=item_autocomplete,want_item=item_autocomplete)
+async def trade(interaction:discord.Interaction,user:discord.Member,
+                give_creature_id:int|None=None,want_creature_id:int|None=None,
+                give_item:str|None=None,give_quantity:app_commands.Range[int,1,1000000]=1,
+                want_item:str|None=None,want_quantity:app_commands.Range[int,1,1000000]=1,
+                give_gold:app_commands.Range[int,0,1000000000]=0,want_gold:app_commands.Range[int,0,1000000000]=0,
+                give_shards:app_commands.Range[int,0,1000000000]=0,want_shards:app_commands.Range[int,0,1000000000]=0):
+    gid,uid=guild_only(interaction)
+    if uid==user.id or user.bot:
+        raise ValueError('Trade with another human server member.')
+    gi=ITEM_LOOKUP.get(give_item.strip().casefold()) if give_item else None
+    wi=ITEM_LOOKUP.get(want_item.strip().casefold()) if want_item else None
+    if (give_item and gi is None) or (want_item and wi is None):
+        raise ValueError('An item name is invalid.')
+    if give_creature_id is not None and give_creature_id==want_creature_id:
+        raise ValueError('Use two different creature IDs.')
+    if not any([give_creature_id,want_creature_id,gi,wi,give_gold,want_gold,give_shards,want_shards]):
+        raise ValueError('Offer at least one creature, item, or currency amount.')
+    async with mutex:
+        if give_creature_id is not None: own_creature(gid,uid,give_creature_id)
+        if want_creature_id is not None: own_creature(gid,user.id,want_creature_id)
+    view=TradeView(gid,uid,user.id,give_creature_id,want_creature_id,gi,wi,give_quantity,want_quantity,give_gold,want_gold,give_shards,want_shards)
+    def describe(cid,item,qty,gold,shards):
+        bits=[]
+        if cid is not None: bits.append(f'Creature #{cid}')
+        if item: bits.append(f'{qty}× {item}')
+        if gold: bits.append(f'{gold:,} Gold Coins')
+        if shards: bits.append(f'{shards:,} Diamond Shards')
+        return ', '.join(bits) or 'Nothing'
+    await interaction.response.send_message(
+        f'**Trade offer** · {interaction.user.mention} ⇄ {user.mention}\n'
+        f'{interaction.user.mention} offers: {describe(give_creature_id,gi,give_quantity,give_gold,give_shards)}\n'
+        f'{user.mention} offers: {describe(want_creature_id,wi,want_quantity,want_gold,want_shards)}\n'
+        f'{user.mention}: accept or decline within 5 minutes.',view=view)
+
+
+@bot.tree.command(name='help_sunny',description='List Sunny the Junipyro commands.')
+async def help_sunny(interaction:discord.Interaction):
+    await feedback(interaction,
+        '**Collect:** /active, /inventory creatures, /inventory items, /balance, /candy, /dice, /trait add\n'
+        '**Shop:** /shop view, /shop buy\n'
+        '**Trade:** /trade\n'
+        '**Admin:** /spawnchannel, /spawnnow, /cspawn, /clevel, /cdelete, /giveitem, /takeitem, /givecurrency, /takecurrency\n'
+        'Catches grant 1–50 Gold Coins and 10–100 EXP to your active creature. Wild catches enter your inventory at Lv. 5.',False)
+
+
+async def main():
+    global http
+    if not TOKEN:
+        raise SystemExit('Set DISCORD_TOKEN in .env or your host environment.')
+    initialize()
+    timeout=aiohttp.ClientTimeout(total=8)
+    async with aiohttp.ClientSession(headers={'User-Agent':'SunnyJunipyroDiscordBot/1.0 (image attribution via source wiki)'},timeout=timeout) as session:
+        http=session
+        # sync once at startup, not once for every on_ready / gateway reconnect.
+        async def setup_hook():
+            if TEST_GUILD_ID:
+                guild=discord.Object(id=int(TEST_GUILD_ID))
+                bot.tree.copy_global_to(guild=guild)
+                await bot.tree.sync(guild=guild)
+            else:
+                await bot.tree.sync()
+            spawn_loop.start()
+        bot.setup_hook=setup_hook
+        await bot.start(TOKEN)
+
+
+if __name__=='__main__':
+    asyncio.run(main())

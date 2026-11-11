@@ -1,0 +1,4 @@
+{
+  "normal": ["Basic", "Shiny", "Pigmented", "Albino", "Dilute", "Vibrant", "Inverted", "Monochrome", "Vitiliginous", "Variant", "Chimeric", "Mottled", "Spotted", "Striped", "Piebald", "Rosetted", "Blotched", "Splattered", "Mosaic", "Bioluminescent", "Jumbo", "Tiny", "Angora", "Atavistic", "Antiatavistic", "Dwarf", "Lanky", "Maned", "Spined", "Frilled", "Longtail", "Manx", "Polycaudal", "Neotenic", "Polyocular", "Corrupt"],
+  "nospawn": ["Gilded", "Ghostly", "Crystalline", "Holographic", "Glitched", "Celestial", "Epic", "Hybrid", "Angelic", "Polycephalic"]
+}
