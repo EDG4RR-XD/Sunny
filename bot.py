@@ -86,10 +86,21 @@ def initialize() -> None:
     CREATE TABLE IF NOT EXISTS id_counter(key INTEGER PRIMARY KEY CHECK(key=1), next_id INTEGER NOT NULL);
     INSERT OR IGNORE INTO id_counter(key,next_id) VALUES(1,1);
     CREATE TABLE IF NOT EXISTS image_cache(species TEXT PRIMARY KEY, image TEXT, wiki TEXT, checked INTEGER NOT NULL);
+    CREATE TABLE IF NOT EXISTS designs(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      guild INTEGER NOT NULL, creature_id INTEGER NOT NULL,
+      submitter INTEGER NOT NULL, submission_url TEXT NOT NULL,
+      attachment_url TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending'
+        CHECK(status IN ('pending','approved','denied')),
+      reviewer INTEGER, created_at INTEGER NOT NULL, reviewed_at INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS designs_creature_lookup ON designs(guild,creature_id,status,id);
     ''')
     cols={r['name'] for r in db.execute('PRAGMA table_info(creatures)').fetchall()}
     if 'exp' not in cols:
         db.execute('ALTER TABLE creatures ADD COLUMN exp INTEGER NOT NULL DEFAULT 0')
+    if 'nickname' not in cols:
+        db.execute('ALTER TABLE creatures ADD COLUMN nickname TEXT')
 
 
 def userrow(guild: int, user: int) -> sqlite3.Row:
@@ -157,6 +168,7 @@ def delete_creature(cid: int) -> None:
         raise ValueError('Creature ID does not exist.')
     conn().execute('UPDATE users SET active_id=NULL,exp=0 WHERE guild=? AND user=? AND active_id=?',
                    (c['guild'],c['owner'],cid))
+    conn().execute('DELETE FROM designs WHERE guild=? AND creature_id=?',(c['guild'],cid))
     conn().execute('DELETE FROM creatures WHERE id=?',(cid,))
     conn().execute('INSERT INTO free_ids(id) VALUES(?)',(cid,))
 
@@ -242,8 +254,21 @@ def roll_die_trait(existing: list[str]) -> str | None:
     return random.choices(pool, weights=[0.2 if t in NOSPAWN_TRAITS else 1.0 for t in pool],k=1)[0]
 
 
+def safe_discord_text(value: str) -> str:
+    # Prevent mentions and markdown injection inside creature labels.
+    return discord.utils.escape_mentions(discord.utils.escape_markdown(value))
+
+
 def fmt_c(c: sqlite3.Row) -> str:
-    return f"**#{c['id']} {c['species']}** · Lv. {c['level']} · {', '.join(json.loads(c['traits']))}"
+    # Link to the newest approved design.
+    species = safe_discord_text(c['species'])
+    approved = conn().execute(
+        'SELECT submission_url FROM designs WHERE guild=? AND creature_id=? AND status=? ORDER BY id DESC LIMIT 1',
+        (c['guild'], c['id'], 'approved')).fetchone()
+    if approved:
+        species = f'[{species}]({approved["submission_url"]})'
+    nickname = f' ({safe_discord_text(c["nickname"])})' if c['nickname'] else ''
+    return f"**#{c['id']} {species}{nickname}** · Lv. {c['level']} · {', '.join(json.loads(c['traits']))}"
 
 
 def transacted(fn):
@@ -258,7 +283,7 @@ def transacted(fn):
         raise
 
 
-async def feedback(interaction: discord.Interaction, message: str, ephemeral: bool=True) -> None:
+async def feedback(interaction: discord.Interaction, message: str, ephemeral: bool=False) -> None:
     if interaction.response.is_done():
         await interaction.followup.send(message, ephemeral=ephemeral)
     else:
@@ -294,8 +319,8 @@ async def item_autocomplete(interaction: discord.Interaction, current: str):
 
 
 class CatchSelect(discord.ui.Select):
-    def __init__(self,guild_id: int,spawn_id: int,counts: dict[str,int]):
-        self.guild_id,self.spawn_id=guild_id,spawn_id
+    def __init__(self,guild_id: int,spawn_id: int,counts: dict[str,int],owner_id:int):
+        self.guild_id,self.spawn_id,self.owner_id=guild_id,spawn_id,owner_id
         opts=[discord.SelectOption(label=k,description=f'{int(v*100)}% chance · owned: {counts[k]}',value=k)
               for k,v in BALL_RATES.items() if counts[k]>0]
         super().__init__(placeholder='Choose a Pokéball',min_values=1,max_values=1,options=opts)
@@ -303,6 +328,9 @@ class CatchSelect(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction) -> None:
         # Acknowledge the dropdown immediately. Discord expires unacknowledged
         # component interactions after roughly three seconds.
+        if interaction.user.id != self.owner_id:
+            await feedback(interaction, 'This Pokéball menu belongs to another player. Click Catch! on the wild spawn to open your own.')
+            return
         await interaction.response.defer(thinking=False)
         try:
             gid, uid = guild_only(interaction)
@@ -335,7 +363,19 @@ class CatchSelect(discord.ui.Select):
                         entry['caught'] = True
 
             if not outcome:
-                await feedback(interaction, f'The {entry["species"]} escaped! One {ball} was used.')
+                # The wild spawn remains catchable. Refresh this public menu so
+                # the player can try again, including with a different ball.
+                async with mutex:
+                    remaining = {name: item_count(gid, uid, name) for name in BALL_RATES}
+                message = (f'{interaction.user.mention} threw a **{ball}**, but the '
+                           f'**{entry["species"]}** escaped! One {ball} was used.')
+                if any(remaining.values()):
+                    message += '\nChoose another Pokéball to try again.'
+                    await interaction.message.edit(content=message,
+                        view=BallMenu(gid, self.spawn_id, remaining, uid))
+                else:
+                    message += '\nYou have no Pokéballs left. Use /shop buy to get more, then click Catch! again.'
+                    await interaction.message.edit(content=message, view=None)
                 return
             cid, gold, earned, leveled = outcome
             level_msg = f' Active creature gained {earned} EXP.' if leveled else ''
@@ -344,7 +384,7 @@ class CatchSelect(discord.ui.Select):
             msg = (f'{interaction.user.mention} caught **{entry["species"]}** (#{cid}, Lv. 5)! '
                    f'Traits: {", ".join(entry["traits"])}. Earned **{gold} Gold Coins**.'
                    + level_msg)
-            await feedback(interaction, msg, ephemeral=False)
+            await interaction.message.edit(content=msg, view=None)
             if entry.get('message'):
                 try:
                     await entry['message'].edit(view=None)
@@ -359,9 +399,9 @@ class CatchSelect(discord.ui.Select):
 
 
 class BallMenu(discord.ui.View):
-    def __init__(self,guild_id: int,spawn_id: int,counts: dict[str,int]):
-        super().__init__(timeout=90)
-        self.add_item(CatchSelect(guild_id,spawn_id,counts))
+    def __init__(self,guild_id: int,spawn_id: int,counts: dict[str,int],owner_id:int):
+        super().__init__(timeout=180)
+        self.add_item(CatchSelect(guild_id,spawn_id,counts,owner_id))
 
 
 class CatchView(discord.ui.View):
@@ -380,7 +420,7 @@ class CatchView(discord.ui.View):
         if not any(counts.values()):
             await feedback(interaction,'You need a ball. Purchase one with /shop buy.')
             return
-        await interaction.response.send_message('Select a ball to throw:',view=BallMenu(gid,self.spawn_id,counts),ephemeral=True)
+        await interaction.response.send_message(f'{interaction.user.mention}, select a ball to throw:',view=BallMenu(gid,self.spawn_id,counts,uid),ephemeral=False)
 
 
 async def post_spawn(guild_id: int,channel_id: int) -> None:
@@ -450,11 +490,12 @@ async def command_error(interaction:discord.Interaction,error:app_commands.AppCo
         root=error.original
     else:
         root=error
+    spawn_admin = interaction.command is not None and interaction.command.name in ('cspawn', 'spawnnow')
     if isinstance(root,ValueError):
-        await feedback(interaction,str(root))
+        await feedback(interaction,str(root),ephemeral=spawn_admin)
     else:
         log.exception('Slash command failed',exc_info=error)
-        await feedback(interaction,'An error occurred. Please contact a server admin.')
+        await feedback(interaction,'An error occurred. Please contact a server admin.',ephemeral=spawn_admin)
 
 
 @bot.tree.command(name='spawnchannel',description='Admin: set the channel for five-minute wild creature spawns.')
@@ -477,7 +518,7 @@ async def spawnnow(interaction:discord.Interaction):
         raise ValueError('Set /spawnchannel first.')
     await interaction.response.defer(ephemeral=True,thinking=True)
     await post_spawn(gid,row['channel'])
-    await feedback(interaction,'Wild creature spawned.')
+    await feedback(interaction,'Wild creature spawned.',ephemeral=True)
 
 
 @bot.tree.command(name='cspawn',description='Admin: grant a creature and any comma-separated traits.')
@@ -490,7 +531,7 @@ async def cspawn(interaction:discord.Interaction,creature:str,user:discord.Membe
     trait_list=parse_traits(traits)
     async with mutex:
         cid=transacted(lambda:create_creature(gid,user.id,creature,trait_list,level))
-    await feedback(interaction,f'Added **{creature}** #{cid} at Lv. {level} to {user.mention}. Traits: {", ".join(trait_list)}.',False)
+    await feedback(interaction,f'Added **{creature}** #{cid} at Lv. {level} to {user.mention}. Traits: {", ".join(trait_list)}.',ephemeral=True)
 
 
 @bot.tree.command(name='clevel',description='Admin: add levels to a creature without replacing its level.')
@@ -589,6 +630,111 @@ async def creature_info(interaction:discord.Interaction,id:int):
         c=own_creature(gid,uid,id)
         current=userrow(gid,uid)['active_id']
     await feedback(interaction,fmt_c(c)+f'\nEXP: {c["exp"]:,}/{exp_needed(c["level"]):,}' + (' · **ACTIVE**' if id==current else ''))
+
+
+@bot.tree.command(name='nickname',description='Give one of your creatures a nickname, or clear it.')
+async def nickname(interaction:discord.Interaction,id:int,name:app_commands.Range[str,1,40]|None=None):
+    gid,uid=guild_only(interaction)
+    if name is not None:
+        name=name.strip()
+        if not name or len(name)>40 or any(ord(ch)<32 or ord(ch)==127 for ch in name):
+            raise ValueError('Nicknames must contain 1–40 printable characters.')
+    async with mutex:
+        own_creature(gid,uid,id)
+        conn().execute('UPDATE creatures SET nickname=? WHERE id=?',(name,id))
+    if name:
+        await feedback(interaction,f'Creature #{id} is now nicknamed **{safe_discord_text(name)}**.')
+    else:
+        await feedback(interaction,f'Nickname cleared for creature #{id}.')
+
+
+design_group=app_commands.Group(name='design',description='Submit creature artwork and review submissions')
+
+@design_group.command(name='submit',description='Submit a design for one of your creatures.')
+async def design_submit(interaction:discord.Interaction,id:int,image:discord.Attachment):
+    gid,uid=guild_only(interaction)
+    if not interaction.channel or not hasattr(interaction.channel, 'send'):
+        raise ValueError('Submit designs in a server text channel.')
+    valid_type=image.content_type and image.content_type.lower().startswith('image/')
+    valid_extension=Path(image.filename).suffix.lower() in ('.png','.jpg','.jpeg','.gif','.webp')
+    if not (valid_type or valid_extension):
+        raise ValueError('Upload a PNG, JPG, GIF, or WebP image.')
+    if image.size > 10*1024*1024:
+        raise ValueError('Design files must be 10 MB or smaller.')
+    async with mutex:
+        c=own_creature(gid,uid,id)
+        species=c['species']
+    await interaction.response.defer(thinking=True)
+    # The user-uploaded attachment appears on the public submission message.
+    # A permanent message URL, rather than a short-lived attachment URL, is the inventory link.
+    posted=await interaction.channel.send(
+        f'**Creature design submission** · #{id} {safe_discord_text(species)}\n'
+        f'Submitted by {interaction.user.mention} · Pending staff review',
+        file=await image.to_file(),
+        allowed_mentions=discord.AllowedMentions.none())
+    try:
+        async with mutex:
+            def save():
+                own_creature(gid,uid,id)
+                cur=conn().execute('INSERT INTO designs(guild,creature_id,submitter,submission_url,attachment_url,status,created_at) VALUES(?,?,?,?,?,?,?)',
+                    (gid,id,uid,posted.jump_url,image.url,'pending',int(time.time())))
+                return cur.lastrowid
+            did=transacted(save)
+    except Exception:
+        await posted.delete()
+        raise
+    await posted.edit(content=(
+        f'**Design #{did}** · Creature #{id} {safe_discord_text(species)}\n'
+        f'Submitted by {interaction.user.mention} · **PENDING** staff review'),
+        allowed_mentions=discord.AllowedMentions.none())
+    await interaction.followup.send(f'Design **#{did}** submitted for creature **#{id}**. Review: {posted.jump_url}')
+
+
+@design_group.command(name='approve',description='Staff: approve a pending creature design.')
+@app_commands.default_permissions(manage_guild=True)
+async def design_approve(interaction:discord.Interaction,design_id:int):
+    gid,_=guild_only(interaction)
+    admin_only(interaction)
+    async with mutex:
+        def approve():
+            d=conn().execute('SELECT * FROM designs WHERE id=? AND guild=?',(design_id,gid)).fetchone()
+            if d is None:
+                raise ValueError('Design ID does not exist in this server.')
+            if d['status']!='pending':
+                raise ValueError(f'That design is already {d["status"]}.')
+            c=conn().execute('SELECT id FROM creatures WHERE guild=? AND id=?',(gid,d['creature_id'])).fetchone()
+            if c is None:
+                raise ValueError('The associated creature no longer exists.')
+            conn().execute('UPDATE designs SET status=?,reviewer=?,reviewed_at=? WHERE id=?',
+                ('approved',interaction.user.id,int(time.time()),design_id))
+            return d
+        d=transacted(approve)
+    await feedback(interaction,f'Approved design **#{design_id}** for creature **#{d["creature_id"]}**. Its inventory name now links to the [approved design]({d["submission_url"]}).')
+
+
+@design_group.command(name='deny',description='Staff: deny a pending creature design.')
+@app_commands.default_permissions(manage_guild=True)
+async def design_deny(interaction:discord.Interaction,design_id:int,reason:app_commands.Range[str,1,250]|None=None):
+    gid,_=guild_only(interaction)
+    admin_only(interaction)
+    async with mutex:
+        def deny():
+            d=conn().execute('SELECT * FROM designs WHERE id=? AND guild=?',(design_id,gid)).fetchone()
+            if d is None:
+                raise ValueError('Design ID does not exist in this server.')
+            if d['status']!='pending':
+                raise ValueError(f'That design is already {d["status"]}.')
+            conn().execute('UPDATE designs SET status=?,reviewer=?,reviewed_at=? WHERE id=?',
+                ('denied',interaction.user.id,int(time.time()),design_id))
+            return d
+        d=transacted(deny)
+    message=f'Denied design **#{design_id}** for creature **#{d["creature_id"]}**.'
+    if reason:
+        message+=f' Reason: {safe_discord_text(reason)}'
+    await feedback(interaction,message)
+
+
+bot.tree.add_command(design_group)
 
 
 @bot.tree.command(name='balance',description='View Gold Coins and Diamond Shards.')
@@ -789,10 +935,10 @@ async def trade(interaction:discord.Interaction,user:discord.Member,
 @bot.tree.command(name='help_sunny',description='List Sunny the Junipyro commands.')
 async def help_sunny(interaction:discord.Interaction):
     await feedback(interaction,
-        '**Collect:** /active, /inventory creatures, /inventory items, /balance, /candy, /dice, /trait add\n'
+        '**Collect:** /active, /inventory creatures, /inventory items, /balance, /candy, /dice, /trait add, /nickname, /design submit\n'
         '**Shop:** /shop view, /shop buy\n'
         '**Trade:** /trade\n'
-        '**Admin:** /spawnchannel, /spawnnow, /cspawn, /clevel, /cdelete, /giveitem, /takeitem, /givecurrency, /takecurrency\n'
+        '**Admin:** /spawnchannel, /spawnnow, /cspawn, /clevel, /cdelete, /giveitem, /takeitem, /givecurrency, /takecurrency, /design approve, /design deny\n'
         'Catches grant 1–50 Gold Coins and 10–100 EXP to your active creature. Wild catches enter your inventory at Lv. 5.',False)
 
 

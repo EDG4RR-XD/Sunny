@@ -77,3 +77,14 @@ To add a species or trait, edit the corresponding file and restart the bot. To c
 ## Implementation notes
 
 The shop, catch, and trade use SQLite transactions with an async mutex to prevent duplicate claims and partial balance changes. Pending trades are kept in bot memory and expire after five minutes. If the bot restarts, any outstanding wild spawn button/trade request expires and the next scheduled spawn replaces the wild message. For a high-traffic production installation, consider durable spawn/trade state. Discord doesn't let bot developers grant permissions automatically, and a successful startup requires the correct Discord token, gateway intent, and channel permissions.
+
+## Creature designs and nicknames
+
+- `/design submit id:<creature ID> image:<attached image>`: submit artwork for a creature you own. Sunny posts the image publicly and assigns a unique design ID.
+- `/design approve design_id:<design ID>`: staff with **Manage Server** permission approve a pending design. The creature species name in `/inventory creatures` and `/creature` becomes a clickable link to the approved submission message.
+- `/design deny design_id:<design ID> reason:<optional reason>`: staff deny a pending submission.
+- `/nickname id:<creature ID> name:<nickname>`: nickname one of your creatures (up to 40 characters). Leave `name` empty to clear it.
+
+Discord requires `/design` to be a slash-command group so its submit, approve, and deny actions use `/design submit`, `/design approve`, and `/design deny` instead of `/design <id>`.
+
+Design IDs are unique and increment independently of creature IDs. A creature may have multiple submissions; its newest approved design is linked. Approved designs and nicknames stay with the creature on trade. When a creature is deleted, its submissions are removed from the database so reused creature IDs do not inherit an old design. Old Discord submission messages are not deleted. All design and nickname responses are public. Store your SQLite database at `/data/sunny.db` on the Railway volume so approval records and nicknames persist across deployments. Existing databases are automatically migrated on startup.
