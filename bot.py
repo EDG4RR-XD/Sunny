@@ -111,6 +111,7 @@ def initialize() -> None:
     CREATE TABLE IF NOT EXISTS art_submissions(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       guild INTEGER NOT NULL, submitter INTEGER NOT NULL, artist INTEGER,
+      creature_id INTEGER,
       type1 TEXT NOT NULL, type2 TEXT, type3 TEXT,
       finish TEXT NOT NULL, shading TEXT NOT NULL, animated TEXT,
       total_gc INTEGER NOT NULL CHECK(total_gc>=0),
@@ -128,6 +129,9 @@ def initialize() -> None:
     design_cols={r['name'] for r in db.execute('PRAGMA table_info(designs)').fetchall()}
     if 'artist' not in design_cols:
         db.execute('ALTER TABLE designs ADD COLUMN artist INTEGER')
+    art_cols={r['name'] for r in db.execute('PRAGMA table_info(art_submissions)').fetchall()}
+    if 'creature_id' not in art_cols:
+        db.execute('ALTER TABLE art_submissions ADD COLUMN creature_id INTEGER')
 
 
 def userrow(guild: int, user: int) -> sqlite3.Row:
@@ -651,6 +655,28 @@ async def cspawn(interaction:discord.Interaction,creature:str,user:discord.Membe
     await feedback(interaction,f'Added **{creature}** #{cid} at Lv. {level} to {user.mention}. Traits: {", ".join(trait_list)}.',ephemeral=True)
 
 
+@bot.tree.command(name='evolve',description='Staff: replace a creature species with any capitalized species name.')
+@app_commands.default_permissions(manage_guild=True)
+async def evolve(interaction:discord.Interaction,id:int,species:str):
+    admin_only(interaction)
+    gid,_=guild_only(interaction)
+    species=species.strip()
+    if not species or not species[0].isalpha() or not species[0].isupper():
+        raise ValueError('Species must start with a capital letter.')
+    if len(species) > 100 or any(ord(char) < 32 for char in species):
+        raise ValueError('Enter a valid species name of up to 100 characters.')
+    async with mutex:
+        def perform_evolution():
+            c=conn().execute('SELECT * FROM creatures WHERE id=? AND guild=?',(id,gid)).fetchone()
+            if c is None:
+                raise ValueError('Creature ID not found in this server.')
+            previous=species_display(c['species'])
+            conn().execute('UPDATE creatures SET species=? WHERE id=? AND guild=?',(species,id,gid))
+            return previous
+        previous=transacted(perform_evolution)
+    await feedback(interaction,f'Creature #{id} evolved from **{safe_discord_text(previous)}** to **{safe_discord_text(species)}**.',False)
+
+
 @bot.tree.command(name='clevel',description='Admin: add levels to a creature without replacing its level.')
 @app_commands.default_permissions(manage_guild=True)
 async def clevel(interaction:discord.Interaction,creature_id:int,levels_to_add:app_commands.Range[int,1,1000000]):
@@ -886,6 +912,7 @@ art_group=app_commands.Group(name='art',description='Submit art for staff approv
 )
 async def art_submit(interaction:discord.Interaction,
                      image:discord.Attachment,
+                     creature_id:int,
                      type:app_commands.Choice[str],
                      finish:app_commands.Choice[str],
                      shading:app_commands.Choice[str],
@@ -896,6 +923,8 @@ async def art_submit(interaction:discord.Interaction,
     if not interaction.channel or not hasattr(interaction.channel, 'send'):
         raise ValueError('Submit art in a server text channel.')
     validate_submission_image(image, 'art image')
+    async with mutex:
+        own_creature(gid,uid,creature_id)
     types=[type.value]
     if type2: types.append(type2.value)
     if type3: types.append(type3.value)
@@ -907,16 +936,19 @@ async def art_submit(interaction:discord.Interaction,
     posted=await interaction.channel.send(
         f'**Art submission**\n'
         f'Submitted by {interaction.user.mention}\n'
+        f'Creature: **#{creature_id}**\n'
         f'Breakdown: {breakdown}\n'
-        f'Total on approval: **{total:,} Gold Coins** and **{total//100:,} Diamond Shards**\n'
+        f'Total on approval: **{total:,} Gold Coins**, **{total//100:,} Diamond Shards**, and **{total//100:,} creature levels**\n'
         f'**PENDING** staff review',
         file=await image.to_file(),
         allowed_mentions=discord.AllowedMentions(users=True, roles=False, everyone=False))
     try:
         async with mutex:
             def save():
-                cur=conn().execute('INSERT INTO art_submissions(guild,submitter,artist,type1,type2,type3,finish,shading,animated,total_gc,submission_url,attachment_url,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-                    (gid,uid,None,types[0],types[1] if len(types)>1 else None,types[2] if len(types)>2 else None,finish.value,shading.value,animated.value if animated else None,total,posted.jump_url,image.url,'pending',int(time.time())))
+                # Revalidate before saving in case ownership changed during the upload.
+                own_creature(gid,uid,creature_id)
+                cur=conn().execute('INSERT INTO art_submissions(guild,submitter,artist,creature_id,type1,type2,type3,finish,shading,animated,total_gc,submission_url,attachment_url,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+                    (gid,uid,None,creature_id,types[0],types[1] if len(types)>1 else None,types[2] if len(types)>2 else None,finish.value,shading.value,animated.value if animated else None,total,posted.jump_url,image.url,'pending',int(time.time())))
                 return cur.lastrowid
             aid=transacted(save)
     except Exception:
@@ -925,12 +957,13 @@ async def art_submit(interaction:discord.Interaction,
     await posted.edit(content=(
         f'**Art #{aid}**\n'
         f'Submitted by {interaction.user.mention}\n'
+        f'Creature: **#{creature_id}**\n'
         f'Breakdown: {breakdown}\n'
-        f'Total on approval: **{total:,} Gold Coins** and **{total//100:,} Diamond Shards**\n'
+        f'Total on approval: **{total:,} Gold Coins**, **{total//100:,} Diamond Shards**, and **{total//100:,} creature levels**\n'
         f'**PENDING** staff review'),
         allowed_mentions=discord.AllowedMentions(users=True, roles=False, everyone=False))
     await interaction.followup.send(
-        f'Art **#{aid}** submitted. Total on approval: **{total:,} Gold Coins** and **{total//100:,} Diamond Shards**. Review: {posted.jump_url}')
+        f'Art **#{aid}** submitted for creature **#{creature_id}**. On approval: **{total:,} Gold Coins**, **{total//100:,} Diamond Shards**, and **{total//100:,} levels**. Review: {posted.jump_url}')
 
 
 @art_group.command(name='approve',description='Staff: approve a pending art submission and pay it out.')
@@ -947,15 +980,23 @@ async def art_approve(interaction:discord.Interaction,art_id:int):
                 raise ValueError(f'That art submission is already {a["status"]}.')
             payout_gold=a['total_gc']
             payout_shards=payout_gold // 100
+            levels=payout_gold // 100
+            if a['creature_id'] is not None:
+                # Legacy submissions with no creature ID retain their original currency payout.
+                creature=own_creature(gid,a['submitter'],a['creature_id'])
+                if levels:
+                    conn().execute('UPDATE creatures SET level=level+? WHERE id=? AND guild=?',
+                                   (levels,creature['id'],gid))
             change_money(gid,a['submitter'],'gold',payout_gold)
             if payout_shards:
                 change_money(gid,a['submitter'],'shards',payout_shards)
             conn().execute('UPDATE art_submissions SET status=?,reviewer=?,reviewed_at=? WHERE id=?',
                 ('approved',interaction.user.id,int(time.time()),art_id))
-            return a, payout_gold, payout_shards
-        a,payout_gold,payout_shards=transacted(approve)
+            return a, payout_gold, payout_shards, levels if a['creature_id'] is not None else 0
+        a,payout_gold,payout_shards,levels=transacted(approve)
     await feedback(interaction,
-        f'Approved art **#{art_id}**. Paid <@{a["submitter"]}> **{payout_gold:,} Gold Coins** and **{payout_shards:,} Diamond Shards**.')
+        f'Approved art **#{art_id}**. Paid <@{a["submitter"]}> **{payout_gold:,} Gold Coins** and **{payout_shards:,} Diamond Shards**.'
+        + (f' Creature **#{a["creature_id"]}** gained **{levels:,} levels**.' if a['creature_id'] is not None else ''))
 
 
 @art_group.command(name='deny',description='Staff: deny a pending art submission.')

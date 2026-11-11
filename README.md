@@ -24,6 +24,7 @@ Upload the folder to a private GitHub repository, create a Railway service from 
 | `/spawnnow` | Admin: post a wild spawn immediately |
 | `/cspawn creature user traits [level]` | Admin: grant a listed creature with any number of comma-separated traits; level defaults to 1 |
 | `/clevel creature_id levels_to_add` | Admin: add levels |
+| `/evolve id species` | Staff (Manage Server): replace the species with any manually entered capitalized species name; preserves ID, level, EXP, and traits |
 | `/cdelete creature_id` | Admin: delete a creature and recycle its unique ID |
 | `/giveitem user item quantity` | Admin: grant items |
 | `/takeitem user item quantity` | Admin: remove items |
@@ -105,3 +106,9 @@ Specific Trait Brushes exist for **every** trait in `traits.json`, including the
 New shop items (Gold Coins / Diamond Shards): Species Egg **2,000 / 20**, Trait Egg **1,000 / 5**, Rare Egg **10,000 / 100**, Trait Eraser **2,000 / 15**, DNA Splicer **1,000 / 9**.
 
 Before deploying, back up your SQLite database. This update uses the existing tables without a schema migration. Release removal is permanent, including approved design database records; existing Discord design messages remain on Discord.
+
+### Art submissions and evolution
+
+`/art submit image creature_id type finish shading [type2] [type3] [animated]` requires a creature ID owned by the submitter. The image and rewards are held for staff review. `/art approve art_id` awards the existing Gold Coins and Diamond Shards plus **1 level per 100 Gold Coins earned** (`total_gc // 100`) directly to that creature. For example, a 700-Gold-Coin payout adds 7 levels. Approval requires the creature to remain in the submitter's inventory. Denied art awards nothing. Existing pending art submissions created before this change can still be approved for currency only. The `creature_id` column is added automatically to existing databases.
+
+`/evolve id species` is staff-only, using the Manage Server permission. Species can be any manually entered name, including names absent from `creatures.txt`. The first letter must be capitalized. No species autocomplete is used. Evolution replaces the creature's species (including any hybrid combination) without changing its other properties.
