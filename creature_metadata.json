@@ -1,0 +1,8922 @@
+{
+  "Bulbasaur": {
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Charmander": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Squirtle": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Caterpie": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Weedle": {
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pidgey": {
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Rattata": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Spearow": {
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Ekans": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Sandshrew": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Vulpix": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Zubat": {
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Oddish": {
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Paras": {
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Venonat": {
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Diglett": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Meowth": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Psyduck": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Mankey": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Growlithe": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Poliwag": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Abra": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Machop": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Bellsprout": {
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Tentacool": {
+    "types": [
+      "water",
+      "poison",
+      "food"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Geodude": {
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Ponyta": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Slowpoke": {
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Magnemite": {
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Farfetch'd": {
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Doduo": {
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Seel": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Grimer": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Shellder": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Gastly": {
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Onix": {
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Drowzee": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Krabby": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Voltorb": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Exeggcute": {
+    "types": [
+      "grass",
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Cubone": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Lickitung": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Koffing": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Rhyhorn": {
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Tangela": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Kangaskhan": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Horsea": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Goldeen": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Staryu": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Scyther": {
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pinsir": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Tauros": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Magikarp": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Lapras": {
+    "types": [
+      "water",
+      "ice"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Ditto": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Eevee": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Porygon": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Omanyte": {
+    "types": [
+      "rock",
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Kabuto": {
+    "types": [
+      "rock",
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Aerodactyl": {
+    "types": [
+      "rock",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Dratini": {
+    "types": [
+      "dragon"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Chikorita": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Cyndaquil": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Totodile": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Sentret": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Hoothoot": {
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Ledyba": {
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Spinarak": {
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Chinchou": {
+    "types": [
+      "water",
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pichu": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Cleffa": {
+    "types": [
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Igglybuff": {
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Togepi": {
+    "types": [
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Natu": {
+    "types": [
+      "psychic",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Mareep": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Hoppip": {
+    "types": [
+      "grass",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Aipom": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Sunkern": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Yanma": {
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Wooper": {
+    "types": [
+      "water",
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Murkrow": {
+    "types": [
+      "dark",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Misdreavus": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Unown": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Girafarig": {
+    "types": [
+      "normal",
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pineco": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Dunsparce": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Gligar": {
+    "types": [
+      "ground",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Snubbull": {
+    "types": [
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Qwilfish": {
+    "types": [
+      "water",
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Shuckle": {
+    "types": [
+      "bug",
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Heracross": {
+    "types": [
+      "bug",
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Sneasel": {
+    "types": [
+      "dark",
+      "ice"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Teddiursa": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Slugma": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Swinub": {
+    "types": [
+      "ice",
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Corsola": {
+    "types": [
+      "water",
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Remoraid": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Delibird": {
+    "types": [
+      "ice",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Skarmory": {
+    "types": [
+      "steel",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Houndour": {
+    "types": [
+      "dark",
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Phanpy": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Stantler": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Smeargle": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Tyrogue": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Smoochum": {
+    "types": [
+      "ice",
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Elekid": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Magby": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Miltank": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Larvitar": {
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Treecko": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Torchic": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Mudkip": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Poochyena": {
+    "types": [
+      "dark"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Zigzagoon": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Wurmple": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Lotad": {
+    "types": [
+      "water",
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Seedot": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Taillow": {
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Wingull": {
+    "types": [
+      "water",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Ralts": {
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Surskit": {
+    "types": [
+      "bug",
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Shroomish": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Slakoth": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Nincada": {
+    "types": [
+      "bug",
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Whismur": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Makuhita": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Azurill": {
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Nosepass": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Skitty": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Sableye": {
+    "types": [
+      "dark",
+      "ghost"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Mawile": {
+    "types": [
+      "steel",
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Aron": {
+    "types": [
+      "steel",
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Meditite": {
+    "types": [
+      "fighting",
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Electrike": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Plusle": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Minun": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Volbeat": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Illumise": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Gulpin": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Carvanha": {
+    "types": [
+      "water",
+      "dark"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Wailmer": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Numel": {
+    "types": [
+      "fire",
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Torkoal": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Spoink": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Spinda": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Trapinch": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Cacnea": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Swablu": {
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Zangoose": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Seviper": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Lunatone": {
+    "types": [
+      "rock",
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Solrock": {
+    "types": [
+      "rock",
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Barboach": {
+    "types": [
+      "water",
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Corphish": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Baltoy": {
+    "types": [
+      "ground",
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Lileep": {
+    "types": [
+      "rock",
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Anorith": {
+    "types": [
+      "rock",
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Feebas": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Castform": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Kecleon": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Shuppet": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Duskull": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Tropius": {
+    "types": [
+      "grass",
+      "flying",
+      "food"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Absol": {
+    "types": [
+      "dark"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Wynaut": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Snorunt": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Spheal": {
+    "types": [
+      "ice",
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Clamperl": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Relicanth": {
+    "types": [
+      "water",
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Luvdisc": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Bagon": {
+    "types": [
+      "dragon"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Beldum": {
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Turtwig": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Chimchar": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Piplup": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Starly": {
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Bidoof": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Kricketot": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Shinx": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Budew": {
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Cranidos": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Shieldon": {
+    "types": [
+      "rock",
+      "steel"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Burmy": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Combee": {
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pachirisu": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Buizel": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Cherubi": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Shellos": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Drifloon": {
+    "types": [
+      "ghost",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Buneary": {
+    "types": [
+      "normal",
+      "food"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Glameow": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Stunky": {
+    "types": [
+      "poison",
+      "dark"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Bronzor": {
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Bonsly": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Mime Jr.": {
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Happiny": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Chatot": {
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Spiritomb": {
+    "types": [
+      "ghost",
+      "dark"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Gible": {
+    "types": [
+      "dragon",
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Munchlax": {
+    "types": [
+      "normal",
+      "food"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Riolu": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Hippopotas": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Skorupi": {
+    "types": [
+      "poison",
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Croagunk": {
+    "types": [
+      "poison",
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Carnivine": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Finneon": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Mantyke": {
+    "types": [
+      "water",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Snover": {
+    "types": [
+      "grass",
+      "ice"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Rotom": {
+    "types": [
+      "electric",
+      "ghost"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Snivy": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Tepig": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Oshawott": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Patrat": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Lillipup": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Purrloin": {
+    "types": [
+      "dark"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pansage": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pansear": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Panpour": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Munna": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pidove": {
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Blitzle": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Roggenrola": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Woobat": {
+    "types": [
+      "psychic",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Drilbur": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Audino": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Timburr": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Tympole": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Throh": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Sawk": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Sewaddle": {
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Venipede": {
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Cottonee": {
+    "types": [
+      "grass",
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Petilil": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Basculin": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Sandile": {
+    "types": [
+      "ground",
+      "dark"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Darumaka": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Maractus": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Dwebble": {
+    "types": [
+      "bug",
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Scraggy": {
+    "types": [
+      "dark",
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Sigilyph": {
+    "types": [
+      "psychic",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Yamask": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Tirtouga": {
+    "types": [
+      "water",
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Archen": {
+    "types": [
+      "rock",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Trubbish": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Zorua": {
+    "types": [
+      "dark"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Minccino": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Gothita": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Solosis": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Ducklett": {
+    "types": [
+      "water",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Vanillite": {
+    "types": [
+      "ice",
+      "food"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Deerling": {
+    "types": [
+      "normal",
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Emolga": {
+    "types": [
+      "electric",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Karrablast": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Foongus": {
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Frillish": {
+    "types": [
+      "water",
+      "ghost"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Alomomola": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Joltik": {
+    "types": [
+      "bug",
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Ferroseed": {
+    "types": [
+      "grass",
+      "steel"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Klink": {
+    "types": [
+      "steel"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Tynamo": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Elgyem": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Litwick": {
+    "types": [
+      "ghost",
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Axew": {
+    "types": [
+      "dragon"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Cubchoo": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Cryogonal": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Shelmet": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Stunfisk": {
+    "types": [
+      "ground",
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Mienfoo": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Druddigon": {
+    "types": [
+      "dragon"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Golett": {
+    "types": [
+      "ground",
+      "ghost"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pawniard": {
+    "types": [
+      "dark",
+      "steel"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Bouffalant": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Rufflet": {
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Vullaby": {
+    "types": [
+      "dark",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Heatmor": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Durant": {
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Deino": {
+    "types": [
+      "dark",
+      "dragon"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Larvesta": {
+    "types": [
+      "bug",
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Chespin": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Fennekin": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Froakie": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Bunnelby": {
+    "types": [
+      "normal",
+      "food"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Fletchling": {
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Scatterbug": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Litleo": {
+    "types": [
+      "fire",
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Flabébé": {
+    "types": [
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Skiddo": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pancham": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Furfrou": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Espurr": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Honedge": {
+    "types": [
+      "steel",
+      "ghost"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Spritzee": {
+    "types": [
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Swirlix": {
+    "types": [
+      "fairy",
+      "food"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Inkay": {
+    "types": [
+      "dark",
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Binacle": {
+    "types": [
+      "rock",
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Skrelp": {
+    "types": [
+      "poison",
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Clauncher": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Helioptile": {
+    "types": [
+      "electric",
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Tyrunt": {
+    "types": [
+      "rock",
+      "dragon"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Amaura": {
+    "types": [
+      "rock",
+      "ice"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Hawlucha": {
+    "types": [
+      "fighting",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Dedenne": {
+    "types": [
+      "electric",
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Carbink": {
+    "types": [
+      "rock",
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Goomy": {
+    "types": [
+      "dragon"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Klefki": {
+    "types": [
+      "steel",
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Phantump": {
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pumpkaboo": {
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Bergmite": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Noibat": {
+    "types": [
+      "flying",
+      "dragon"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Rowlet": {
+    "types": [
+      "grass",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Litten": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Popplio": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pikipek": {
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Yungoos": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Grubbin": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Crabrawler": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Oricorio": {
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Cutiefly": {
+    "types": [
+      "bug",
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Rockruff": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Wishiwashi": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Mareanie": {
+    "types": [
+      "poison",
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Mudbray": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Dewpider": {
+    "types": [
+      "water",
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Fomantis": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Morelull": {
+    "types": [
+      "grass",
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Salandit": {
+    "types": [
+      "poison",
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Stufful": {
+    "types": [
+      "normal",
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Bounsweet": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Comfey": {
+    "types": [
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Oranguru": {
+    "types": [
+      "normal",
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Passimian": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Wimpod": {
+    "types": [
+      "bug",
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Sandygast": {
+    "types": [
+      "ghost",
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pyukumuku": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Minior": {
+    "types": [
+      "rock",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Komala": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Turtonator": {
+    "types": [
+      "fire",
+      "dragon"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Togedemaru": {
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Mimikyu": {
+    "types": [
+      "ghost",
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Bruxish": {
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Drampa": {
+    "types": [
+      "normal",
+      "dragon"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Dhelmise": {
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Jangmo-o": {
+    "types": [
+      "dragon"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Grookey": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Scorbunny": {
+    "types": [
+      "fire",
+      "food"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Sobble": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Skwovet": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Rookidee": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Blipbug": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Nickit": {
+    "types": [
+      "dark"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Gossifleur": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Wooloo": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Chewtle": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Yamper": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Rolycoly": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Applin": {
+    "types": [
+      "grass",
+      "dragon",
+      "food"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Silicobra": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Cramorant": {
+    "types": [
+      "flying",
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Arrokuda": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Toxel": {
+    "types": [
+      "electric",
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Sizzlipede": {
+    "types": [
+      "fire",
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Clobbopus": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Sinistea": {
+    "types": [
+      "ghost",
+      "food"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Hatenna": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Impidimp": {
+    "types": [
+      "dark",
+      "fairy"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Milcery": {
+    "types": [
+      "fairy",
+      "food"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Falinks": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pincurchin": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Snom": {
+    "types": [
+      "ice",
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Stonjourner": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Eiscue": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Indeedee": {
+    "types": [
+      "psychic",
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Morpeko": {
+    "types": [
+      "electric",
+      "dark"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Cufant": {
+    "types": [
+      "steel"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Duraludon": {
+    "types": [
+      "steel",
+      "dragon"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Dreepy": {
+    "types": [
+      "dragon",
+      "ghost"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Sprigatito": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Fuecoco": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Quaxly": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Lechonk": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Tarountula": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Nymble": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pawmi": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Tandemaus": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Fidough": {
+    "types": [
+      "fairy",
+      "food"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Smoliv": {
+    "types": [
+      "grass",
+      "normal",
+      "food"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Squawkabilly": {
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Nacli": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Charcadet": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Tadbulb": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Wattrel": {
+    "types": [
+      "electric",
+      "flying"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Maschiff": {
+    "types": [
+      "dark"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Shroodle": {
+    "types": [
+      "poison",
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Bramblin": {
+    "types": [
+      "grass",
+      "ghost"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Toedscool": {
+    "types": [
+      "ground",
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Klawf": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Capsakid": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Rellor": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Flittle": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Tinkatink": {
+    "types": [
+      "fairy",
+      "steel"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Wiglett": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Bombirdier": {
+    "types": [
+      "flying",
+      "dark"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Finizen": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Varoom": {
+    "types": [
+      "steel",
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Cyclizar": {
+    "types": [
+      "dragon",
+      "normal"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Orthworm": {
+    "types": [
+      "steel"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Glimmet": {
+    "types": [
+      "rock",
+      "poison"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Greavard": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Flamigo": {
+    "types": [
+      "flying",
+      "fighting"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Cetoddle": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Veluza": {
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Dondozo": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Tatsugiri": {
+    "types": [
+      "dragon",
+      "water"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Frigibax": {
+    "types": [
+      "dragon",
+      "ice"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Gimmighoul": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Poltchageist": {
+    "types": [
+      "grass",
+      "ghost",
+      "food"
+    ],
+    "series": [
+      "pokemon"
+    ]
+  },
+  "Pupskey": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Vipember": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Tabbolt": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Skrappey": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Foxsy": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Bearby": {
+    "types": [
+      "food"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Mabat": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Fishel": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Borbo": {
+    "types": [
+      "flying",
+      "normal"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Rosebug": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Bunsweet": {
+    "types": [
+      "normal",
+      "food"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Mooble": {
+    "types": [
+      "normal",
+      "fighting"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Budsillar": {
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Nibblen": {
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Plipo": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Coalt": {
+    "types": [
+      "normal",
+      "ground"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Bakan": {
+    "types": [
+      "flying",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Tadappole": {
+    "types": [
+      "food",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Garracude": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Moss": {
+    "types": [
+      "grass",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Larvennae": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Hopus": {
+    "types": [
+      "normal",
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Flittum": {
+    "types": [
+      "flying",
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Yagoat": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Geckgoo": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Wiglet": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Archuma": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Leapo": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Wisp": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Appluff": {
+    "types": [
+      "flying",
+      "food"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Pebblett": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Emberfly": {
+    "types": [
+      "fire",
+      "bug"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Springling": {
+    "types": [
+      "normal",
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Glimmew": {
+    "types": [
+      "fairy"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Snobat": {
+    "types": [
+      "flying",
+      "ice"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Tortles": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Faunsprout": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Blossaur": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Mant": {
+    "types": [
+      "bug",
+      "psychic"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Statikeet": {
+    "types": [
+      "flying",
+      "electric"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Emoticat": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Partybug": {
+    "types": [
+      "normal",
+      "bug",
+      "psychic"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Cocosquid": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Aspark": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Angerler": {
+    "types": [
+      "fairy",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Malotrick": {
+    "types": [
+      "dark",
+      "psychic"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Schiwi": {
+    "types": [
+      "ice",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Kelpie": {
+    "types": [
+      "ghost",
+      "water",
+      "food"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Apurrition": {
+    "types": [
+      "psychic",
+      "ghost"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Sharpup": {
+    "types": [
+      "steel",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Klicki": {
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Maskrow": {
+    "types": [
+      "flying",
+      "dark"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Grimsugar": {
+    "types": [
+      "dark",
+      "food"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Dramask": {
+    "types": [
+      "dark",
+      "fairy"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Bun-shi": {
+    "types": [
+      "food",
+      "ghost"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Nymshrew": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Ruffire": {
+    "types": [
+      "normal",
+      "fire"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Indigoo": {
+    "types": [
+      "food"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Gauzli": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Shmellow": {
+    "types": [
+      "food"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Muncheez": {
+    "types": [
+      "fire",
+      "food"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Azúpion": {
+    "types": [
+      "food",
+      "poison"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Tyki": {
+    "types": [
+      "food"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Calamander": {
+    "types": [
+      "food"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Sizzlrimp": {
+    "types": [
+      "fire",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Lilbulb": {
+    "types": [
+      "fairy"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Fledgeo": {
+    "types": [
+      "flying",
+      "ground"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Staligant": {
+    "types": [
+      "rock",
+      "psychic"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Aquafi": {
+    "types": [
+      "poison",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Fluppy": {
+    "types": [
+      "fairy",
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Junipyro": {
+    "types": [
+      "fire",
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Squonk": {
+    "types": [
+      "grass",
+      "ghost"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Hollihare": {
+    "types": [
+      "ice",
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Swoptar": {
+    "types": [
+      "normal",
+      "steel"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Edibebi": {
+    "types": [
+      "bug",
+      "electric",
+      "food"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Owol": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Threec": {
+    "types": [
+      "normal",
+      "bug"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Dustoon": {
+    "types": [
+      "normal",
+      "poison"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Buoyanseal": {
+    "types": [
+      "normal",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Dewaffe": {
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Ahket": {
+    "types": [
+      "ground",
+      "bug"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Agotoad": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Potunk": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Grunkul": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Ostigon": {
+    "types": [
+      "normal",
+      "poison"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Jewelit": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Blubimp": {
+    "types": [
+      "flying",
+      "rock"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Thunger": {
+    "types": [
+      "normal",
+      "electric"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Zapion": {
+    "types": [
+      "poison",
+      "electric"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Minjoule": {
+    "types": [
+      "normal",
+      "electric"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Megglit": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Impling": {
+    "types": [
+      "fire",
+      "ghost"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Threasant": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Skoplet": {
+    "types": [
+      "bug",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Hippop": {
+    "types": [
+      "ground",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Prophant": {
+    "types": [
+      "fairy",
+      "psychic"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Auron": {
+    "types": [
+      "fire",
+      "steel"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Feesh": {
+    "types": [
+      "normal",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Sobbuoy": {
+    "types": [
+      "fighting",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Bellbird": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Ciyrup": {
+    "types": [
+      "food",
+      "ice"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Mistlil": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Kacoal": {
+    "types": [
+      "dark",
+      "bug"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Yulogg": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Chilloud": {
+    "types": [
+      "normal",
+      "ice"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Wrappy": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Wydling": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Yonna": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Shyce": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Jiangbo": {
+    "types": [
+      "normal",
+      "fire"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Saltot": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Circhick": {
+    "types": [
+      "ice",
+      "electric"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Skurikid": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Morphiu": {
+    "types": [
+      "flying",
+      "normal",
+      "ground",
+      "fire",
+      "psychic",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Acorv": {
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Vulcryst": {
+    "types": [
+      "rock",
+      "dark"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Flaskit": {
+    "types": [
+      "normal",
+      "rock"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Toxode": {
+    "types": [
+      "steel",
+      "poison"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Cthuwu": {
+    "types": [
+      "dark",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Alptusk": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Grom": {
+    "types": [
+      "dark"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Scorm": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Lizzerts": {
+    "types": [
+      "food"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Foresatl": {
+    "types": [
+      "normal",
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Cinderling": {
+    "types": [
+      "flying",
+      "fire"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Trilosect": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Squinana": {
+    "types": [
+      "food",
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Mallemole": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Hattrix": {
+    "types": [
+      "dark",
+      "psychic"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Floppet": {
+    "types": [
+      "normal",
+      "psychic"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Hauntomb": {
+    "types": [
+      "ground",
+      "ghost"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Cryptix": {
+    "types": [
+      "steel",
+      "ghost"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Miasmol": {
+    "types": [
+      "steel",
+      "poison"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Lilit": {
+    "types": [
+      "fairy",
+      "ghost"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Pumkibun": {
+    "types": [
+      "fairy",
+      "ghost",
+      "food"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Mintiger": {
+    "types": [
+      "normal",
+      "food"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Kitave": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Pickit": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Teddot": {
+    "types": [
+      "normal",
+      "steel"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Snarmel": {
+    "types": [
+      "food",
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Maizite": {
+    "types": [
+      "food",
+      "bug"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Cosmat": {
+    "types": [
+      "flying",
+      "dark"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Freqrec": {
+    "types": [
+      "psychic",
+      "electric"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Scentino": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Cobblepawn": {
+    "types": [
+      "ground",
+      "fire"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Illumina": {
+    "types": [
+      "psychic",
+      "water"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Flamtot": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Iciclaw": {
+    "types": [
+      "ice",
+      "steel"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Gladilittle": {
+    "types": [
+      "fairy",
+      "steel"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Arctillo": {
+    "types": [
+      "ice",
+      "fighting"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Weevapillar": {
+    "types": [
+      "bug",
+      "psychic"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Holiturt": {
+    "types": [
+      "fairy"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Kookalit": {
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Krow": {
+    "types": [
+      "flying",
+      "ghost"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Fulmon": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Myphoxic": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Trithorn": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Volcanaur": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Velocivult": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Wormzu": {
+    "types": [
+      "fighting",
+      "psychic"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Senstruct": {
+    "types": [
+      "steel",
+      "ghost"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Isopi": {
+    "types": [
+      "fire",
+      "bug"
+    ],
+    "series": [
+      "doodle"
+    ]
+  },
+  "Embit": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Dripple": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Fevine": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Eaglit": {
+    "types": [
+      "fairy"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Vambat": {
+    "types": [
+      "dark"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Snocub": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Weevolt": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Twilat": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Cathorn": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Twittle": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Pyder": {
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Antsee": {
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Grubby": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Kleptyke": {
+    "types": [
+      "dark"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Babore": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Geklow": {
+    "types": [
+      "electric",
+      "fairy"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Slugling": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Kabunga": {
+    "types": [
+      "psychic",
+      "grass",
+      "food"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Shawchi": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Rakrawla": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Gumpod": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Phancub": {
+    "types": [
+      "fighting",
+      "ghost"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Whispup": {
+    "types": [
+      "fire",
+      "ghost"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Skilava": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Craytal": {
+    "types": [
+      "fire",
+      "ice",
+      "grass"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Igneol": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Cafnote": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Gobbidemic": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Icigool": {
+    "types": [
+      "ice",
+      "ghost"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Pyramind": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Burroach": {
+    "types": [
+      "bug",
+      "ground"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Whimpor": {
+    "types": [
+      "flying",
+      "steel"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Territi": {
+    "types": [
+      "steel",
+      "poison"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Operaptor": {
+    "types": [
+      "ground",
+      "steel"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Chompactor": {
+    "types": [
+      "steel"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Scorb": {
+    "types": [
+      "electric",
+      "fire",
+      "ice",
+      "steel"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Poochrol": {
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Goppie": {
+    "types": [
+      "water",
+      "food"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Pyke": {
+    "types": [
+      "rock",
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Zaleo": {
+    "types": [
+      "rock",
+      "electric"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Dobo": {
+    "types": [
+      "rock",
+      "fire"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Kyogo": {
+    "types": [
+      "rock",
+      "dark"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Wiledile": {
+    "types": [
+      "grass",
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Ampole": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Pwuff": {
+    "types": [
+      "poison",
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Swimp": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Hydrini": {
+    "types": [
+      "bug",
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Ceratot": {
+    "types": [
+      "rock",
+      "grass"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Cupoink": {
+    "types": [
+      "fire",
+      "food"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Mochibi": {
+    "types": [
+      "ice",
+      "food"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Gwurm": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Pipsee": {
+    "types": [
+      "flying",
+      "grass"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Vari": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Copling": {
+    "types": [
+      "rock",
+      "steel"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Spirivii": {
+    "types": [
+      "bug",
+      "ghost"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Snowl": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Snagull": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Makame": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Cavenish": {
+    "types": [
+      "grass",
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Kanki": {
+    "types": [
+      "fighting",
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Sharpod": {
+    "types": [
+      "steel",
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Lumica": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Polypi": {
+    "types": [
+      "fairy",
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Taoshi": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Kittone": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Boonary": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Somata": {
+    "types": [
+      "psychic",
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Cinnaboo": {
+    "types": [
+      "ghost",
+      "food"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Swirelle": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Swishy": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Bunpuff": {
+    "types": [
+      "ground",
+      "grass",
+      "food"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Dractus": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Volpup": {
+    "types": [
+      "electric",
+      "poison"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Impkin": {
+    "types": [
+      "dark"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Mistlebud": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Cryocub": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Kyeggo": {
+    "types": [
+      "dark"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Wispur": {
+    "types": [
+      "fairy",
+      "ghost"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Smoal": {
+    "types": [
+      "fire",
+      "poison"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Sherbot": {
+    "types": [
+      "ice",
+      "steel"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Llamba": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Singeel": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Crabushi": {
+    "types": [
+      "fighting",
+      "steel"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Teripod": {
+    "types": [
+      "rock",
+      "fairy"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Skampi": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Dokan": {
+    "types": [
+      "ground",
+      "poison"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Mirrami": {
+    "types": [
+      "steel",
+      "ghost"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Thawmin": {
+    "types": [
+      "ice",
+      "psychic"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Leshent": {
+    "types": [
+      "dark",
+      "grass"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Kayute": {
+    "types": [
+      "dark",
+      "ice"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Leopaw": {
+    "types": [
+      "ice",
+      "fairy"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Eyebrella": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Lissen": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Lantot": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Milgoo": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Nautling": {
+    "types": [
+      "rock",
+      "normal"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Yutiny": {
+    "types": [
+      "flying",
+      "rock"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Venile": {
+    "types": [
+      "rock",
+      "poison"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Nymvolt": {
+    "types": [
+      "bug",
+      "electric"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Cicalute": {
+    "types": [
+      "bug",
+      "psychic"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Goswing": {
+    "types": [
+      "flying",
+      "normal"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Banooh": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Spirwix": {
+    "types": [
+      "fire",
+      "ghost"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Grievestone": {
+    "types": [
+      "ground",
+      "ghost"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Jimby": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Wassel": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Snicle": {
+    "types": [
+      "dark",
+      "ice"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Nakichi": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Terracolt": {
+    "types": [
+      "ground",
+      "fire"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Minink": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Vermador": {
+    "types": [
+      "fighting",
+      "ground"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Puppear": {
+    "types": [
+      "ground",
+      "grass"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Cubscoot": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Larvoll": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Spinette": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Trilobit": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Curccul": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Esperae": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Ponite": {
+    "types": [
+      "fairy"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Sylphairi": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Humby": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Cubali": {
+    "types": [
+      "ground",
+      "psychic"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Arketta": {
+    "types": [
+      "fighting",
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Gajahra": {
+    "types": [
+      "fighting",
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Glintera": {
+    "types": [
+      "dark",
+      "ground",
+      "electric",
+      "fire",
+      "fairy",
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Noctulite": {
+    "types": [
+      "rock",
+      "steel"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Pikbug": {
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Kumiro": {
+    "types": [
+      "ice",
+      "ghost"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Vollops": {
+    "types": [
+      "electric",
+      "ghost"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Snifflin": {
+    "types": [
+      "ice",
+      "normal"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Svelpup": {
+    "types": [
+      "ice",
+      "water"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Tadplode": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Snugguin": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Plasmite": {
+    "types": [
+      "bug",
+      "fire"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Embryx": {
+    "types": [
+      "dark"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Koz-Moh": {
+    "types": [
+      "steel",
+      "normal"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Navilite": {
+    "types": [
+      "steel"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Eagrim": {
+    "types": [
+      "flying",
+      "electric"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Sprigna": {
+    "types": [
+      "ice",
+      "grass"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Ignigrub": {
+    "types": [
+      "bug",
+      "fire"
+    ],
+    "series": [
+      "loomian"
+    ]
+  },
+  "Cubzero": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Toruga": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Nibblegar": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Swurmy": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Silquill": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Slitherpin": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Houndos": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Armado": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Sanscale": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Bittybolt": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Bloby": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Fiddly": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Moffel": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Buzzlet": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Lunarpup": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Kryo": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Bren": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Acie": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Kyreptil": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Gella": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Skarbone": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Droople": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Arcta": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Seraphace": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Squidma": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Lumon": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Patterbit": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Decibite": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Taddle": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Tinshel": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Blizzburd": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Purrgy": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Gauslime": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Quagoo": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Squidly": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Ruptius": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Mooby": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Flowish": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "coromon",
+      "beastieball"
+    ]
+  },
+  "Mino": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Frova": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Otogy": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Shimshell": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Lemobi": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Glacikid": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "coromon"
+    ]
+  },
+  "Mimit": {
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Oree": {
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Chromeon": {
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Halzhi": {
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Platypet": {
+    "types": [
+      "water",
+      "poison"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Swali": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Tateru": {
+    "types": [
+      "normal",
+      "food"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Gharunder": {
+    "types": [
+      "poison",
+      "electric"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Mosu": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Paharo": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Ampling": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Bunbun": {
+    "types": [
+      "ground",
+      "rock",
+      "food"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Hidody": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Fomu": {
+    "types": [
+      "water",
+      "food"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Wiplump": {
+    "types": [
+      "water",
+      "flying"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Skail": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Houchic": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Smazee": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Crystle": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Sherald": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Pocus": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Sparzy": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Magmis": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Mastione": {
+    "types": [
+      "fire",
+      "water"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Banapi": {
+    "types": [
+      "fire",
+      "food"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Lapinite": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Azuroc": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Bigu": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Kinu": {
+    "types": [
+      "grass",
+      "psychic"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Raiber": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Pewki": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Saipat": {
+    "types": [
+      "water",
+      "fighting"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Tuwai": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Barnshe": {
+    "types": [
+      "flying",
+      "psychic"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Gyalis": {
+    "types": [
+      "rock",
+      "fighting"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Occlura": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Myx": {
+    "types": [
+      "rock",
+      "psychic"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Umishi": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Piraniant": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Orphyll": {
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Nessla": {
+    "types": [
+      "water",
+      "electric"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Valash": {
+    "types": [
+      "normal",
+      "rock"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Kalazu": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Adoroboros": {
+    "types": [
+      "poison",
+      "psychic"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Taifu": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Ganki": {
+    "types": [
+      "electric",
+      "flying"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Oceara": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Yowlar": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Droply": {
+    "types": [
+      "water",
+      "ground"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Shuine": {
+    "types": [
+      "rock",
+      "water"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Valiar": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Toxolotl": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Blooze": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Zephyruff": {
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Spriole": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Goty": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Akranox": {
+    "types": [
+      "ground",
+      "poison"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Grumvel": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Vulvir": {
+    "types": [
+      "fire",
+      "ground"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Reval": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Innki": {
+    "types": [
+      "electric",
+      "rock"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Hoglip": {
+    "types": [
+      "electric",
+      "steel",
+      "fire"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Smolzy": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Hegine": {
+    "types": [
+      "electric",
+      "steel",
+      "fire"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Minox": {
+    "types": [
+      "psychic",
+      "electric"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Momo": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Mawtle": {
+    "types": [
+      "electric",
+      "steel",
+      "grass"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Pupoise": {
+    "types": [
+      "electric",
+      "steel",
+      "grass"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Kuri": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Osuchi": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Mushi": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Hazrat": {
+    "types": [
+      "poison",
+      "fire"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Mitty": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Koish": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Scarawatt": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Chubee": {
+    "types": [
+      "electric",
+      "steel",
+      "flying"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "0b1": {
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "0b10": {
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Aohi": {
+    "types": [
+      "psychic",
+      "fire"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Amphatyr": {
+    "types": [
+      "electric",
+      "grass"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Arachnyte": {
+    "types": [
+      "normal",
+      "electric",
+      "steel"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Chimurian": {
+    "types": [
+      "grass",
+      "rock"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Galvanid": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Gorong": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Mouflank": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Nagaise": {
+    "types": [
+      "psychic",
+      "water"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Rhoulder": {
+    "types": [
+      "normal",
+      "ground"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Seismunch": {
+    "types": [
+      "fighting",
+      "ground",
+      "food"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Shaolant": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Thaiko": {
+    "types": [
+      "electric",
+      "steel",
+      "fighting"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Venx": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Anahir": {
+    "types": [
+      "rock",
+      "fire"
+    ],
+    "series": [
+      "temtem"
+    ]
+  },
+  "Rabush": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Charcile": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Chewaqua": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Notent": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Eyaspire": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Calypillar": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Doopy": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Toopy": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Kitweed": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Rootrake": {
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Purrlazy": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Stagurai": {
+    "types": [
+      "bug",
+      "fighting"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Bombeetle": {
+    "types": [
+      "bug",
+      "fire"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Manxo": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Growhog": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Psycalf": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Chickbin": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Radlil": {
+    "types": [
+      "ground",
+      "grass"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Citrin": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Maccry": {
+    "types": [
+      "flying",
+      "fairy"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Spooder": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Usbee": {
+    "types": [
+      "bug",
+      "electric"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Cornica": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Drippo": {
+    "types": [
+      "grass",
+      "water"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Antroop": {
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Cheerdeer": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Fliridiant": {
+    "types": [
+      "bug",
+      "fairy"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Bellbuzz": {
+    "types": [
+      "bug",
+      "fighting"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Corrok": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Chromilleon": {
+    "types": [
+      "ground",
+      "poison"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Funglow": {
+    "types": [
+      "fairy",
+      "poison"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Moleroup": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Bouldog": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Kashroom": {
+    "types": [
+      "ground",
+      "poison"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Lilite": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Fordrake": {
+    "types": [
+      "dragon",
+      "steel"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Termitate": {
+    "types": [
+      "bug",
+      "water"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Cheeruft": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Chinciny": {
+    "types": [
+      "fairy"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Sungadem": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Fuzzimp": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Opaline": {
+    "types": [
+      "dragon",
+      "fairy"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Climitten": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Snoloth": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Snowkit": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Elegelo": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Felflora": {
+    "types": [
+      "fairy"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Tillew": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Bubboba": {
+    "types": [
+      "water",
+      "food"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Dolfib": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Bubear": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Crustaqua": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Ornitiny": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Chicrook": {
+    "types": [
+      "flying",
+      "dark"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Albarrel": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Electricalf": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Wispling": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Giftot": {
+    "types": [
+      "dark",
+      "fire"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Bitbyte": {
+    "types": [
+      "steel"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Embrr": {
+    "types": [
+      "fire",
+      "ice"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Shelles": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Ringu": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Palmy": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Tombini": {
+    "types": [
+      "ground",
+      "ghost"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Turatell": {
+    "types": [
+      "flying",
+      "water"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Rnake": {
+    "types": [
+      "ice",
+      "poison"
+    ],
+    "series": [
+      "tanorio"
+    ]
+  },
+  "Platyfoo": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Gnob": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Hobyn": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Pira": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Pandicub": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Fropip": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Spina": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Flexel": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Tyregg": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Stoogu": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Perleo": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Bulken": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Kiklick": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Florantis": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Camoleon": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Fanfrou": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Arigami": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Turbinha": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Nekomba": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Emotel": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Tryflap": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Scurrel": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Digga": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Parrpy": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Bowish": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Candrama": {
+    "types": [
+      "fire",
+      "food"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Replicanti": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Saxia": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Arnut": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Durtworm": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Breeshy": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Sprouti": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Robatt": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Cactino": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Miglet": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Vultic": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Leafegg": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Cheekmunk": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Vulazy": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Blizo": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Fethra": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Bevy": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Sprunk": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Velokitti": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Petril": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "nexomon"
+    ]
+  },
+  "Springheel": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Carniviper": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Traffikrab": {
+    "types": [
+      "steel"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Candevil": {
+    "types": [
+      "normal",
+      "food"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Bansheep": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Sirenade": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Dandylion": {
+    "types": [
+      "grass",
+      "fairy"
+    ],
+    "series": [
+      "tanorio",
+      "cassette"
+    ]
+  },
+  "Macabra": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Dominoth": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Squirey": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Kittelly": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Puppercut": {
+    "types": [
+      "steel"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Bulletino": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Diveal": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Nevermort": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Clocksley": {
+    "types": [
+      "steel"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Thwackalope": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Allseer": {
+    "types": [
+      "steel"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Braxsuit": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Sanzatime": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Salamagus": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Muskrateer": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Padpole": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Elfless": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Brushroom": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Boltam": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Busheye": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Terracooka": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Stardigrade": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Mascotoy": {
+    "types": [
+      "steel"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Binvader": {
+    "types": [
+      "steel"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Twirligig": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Jellyton": {
+    "types": [
+      "poison",
+      "food"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Spirouette": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Jumpkin": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Pawndead": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Burnace": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Faucetear": {
+    "types": [
+      "water",
+      "food"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Cluckabilly": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Pondwalker": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Pombomb": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Icepeck": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Sparktan": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Arkidd": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Khepri": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Djinn Entonic": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Anathema": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Kuneko": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Averevoir": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Glaistain": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Miss Mimic": {
+    "types": [
+      "steel"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Picksie": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Umbrahella": {
+    "types": [
+      "poison"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Spooki-onna": {
+    "types": [
+      "ice"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Folklord": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Pawper": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "cassette"
+    ]
+  },
+  "Sprecko": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Bongus": {
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Axolati": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Kichik": {
+    "types": [
+      "fighting"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Waglash": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Leobro": {
+    "types": [
+      "fire"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Turtaneer": {
+    "types": [
+      "water",
+      "steel"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Xiphosaur": {
+    "types": [
+      "steel",
+      "rock"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Petula": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Gullit": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Skorock": {
+    "types": [
+      "rock"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Noizard": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Merrifly": {
+    "types": [
+      "fairy",
+      "flying"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Scrubbub": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Grubiron": {
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Wottle": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Webbounce": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Goofsder": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Varkabond": {
+    "types": [
+      "dark"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Mudslee": {
+    "types": [
+      "ground",
+      "water"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Froofulks": {
+    "types": [
+      "fairy"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Blitzwift": {
+    "types": [
+      "electric"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Hydrolm": {
+    "types": [
+      "water"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Collarva": {
+    "types": [
+      "bug"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Wisper": {
+    "types": [
+      "ghost"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Mistic": {
+    "types": [
+      "psychic"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Plumask": {
+    "types": [
+      "flying"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Jellibat": {
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Specko": {
+    "types": [
+      "normal"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Turogue": {
+    "types": [
+      "dark"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Cherrily": {
+    "types": [
+      "grass"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Magpike": {
+    "types": [
+      "flying",
+      "steel"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Squidmage": {
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Diggum": {
+    "types": [
+      "ground"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  },
+  "Platypulse": {
+    "types": [
+      "water",
+      "electric"
+    ],
+    "series": [
+      "beastieball"
+    ]
+  }
+}

@@ -28,6 +28,9 @@ NORMAL_TRAITS = TRAIT_DATA['normal']
 NOSPAWN_TRAITS = TRAIT_DATA['nospawn']
 ALL_TRAITS = NORMAL_TRAITS + NOSPAWN_TRAITS
 CREATURE_LOOKUP = {s.casefold(): s for s in CREATURES}
+METADATA = {name.casefold(): data for name, data in json.loads((ROOT / 'creature_metadata.json').read_text(encoding='utf-8')).items()}
+TYPE_NAMES = sorted({t for data in METADATA.values() for t in data['types']})
+SERIES_NAMES = sorted({t for data in METADATA.values() for t in data['series']})
 TRAIT_LOOKUP = {s.casefold(): s for s in ALL_TRAITS}
 ITEMS = {
     'Rare Candy': {'gold': 500, 'shards': 2},
@@ -36,6 +39,8 @@ ITEMS = {
     'Ultra Ball': {'gold': 600, 'shards': 4},
     'Dice': {'gold': 1000, 'shards': 1},
     'Trait Brush': {'gold': 1500, 'shards': 5},
+    'Series Egg': {'gold': 500, 'shards': 5},
+    'Type Egg': {'gold': 500, 'shards': 5},
     'Species Egg': {'gold': 2000, 'shards': 20},
     'Trait Egg': {'gold': 1000, 'shards': 5},
     'Rare Egg': {'gold': 10000, 'shards': 100},
@@ -353,16 +358,48 @@ def safe_discord_text(value: str) -> str:
     return discord.utils.escape_mentions(discord.utils.escape_markdown(value))
 
 
+def creature_label(c) -> str:
+    return safe_discord_text(c['nickname'] or species_display(c['species']))
+
+
+def creature_ref(cid: int, guild: int) -> str:
+    c = conn().execute('SELECT * FROM creatures WHERE id=? AND guild=?', (cid,guild)).fetchone()
+    return creature_label(c) if c else 'removed creature'
+
+
+def metadata_display(raw: str) -> str:
+    values = {key: list(dict.fromkeys(value for name in species_list(raw)
+              for value in METADATA.get(name.casefold(), {}).get(key, ['Unknown'])))
+              for key in ('types', 'series')}
+    return '**Type:** ' + ', '.join(values['types']) + '\n**Series:** ' + ', '.join(values['series'])
+
+
+def egg_pool(item: str, selection: str | None) -> list[str]:
+    key = 'series' if item == 'Series Egg' else 'types'
+    if not selection or not selection.strip():
+        raise ValueError('Choose a ' + ('series.' if key == 'series' else 'type.'))
+    pool = [name for name in CREATURES if selection.strip().casefold() in METADATA.get(name.casefold(), {}).get(key, [])]
+    if not pool:
+        raise ValueError('No eligible creatures for that ' + ('series.' if key == 'series' else 'type.'))
+    return pool
+
+
+async def series_autocomplete(interaction: discord.Interaction, current: str):
+    return [app_commands.Choice(name=x, value=x) for x in SERIES_NAMES if current.casefold() in x.casefold()][:25]
+
+
+async def type_autocomplete(interaction: discord.Interaction, current: str):
+    return [app_commands.Choice(name=x, value=x) for x in TYPE_NAMES if current.casefold() in x.casefold()][:25]
+
+
 def fmt_c(c: sqlite3.Row) -> str:
-    # Link to the newest approved design.
-    species = safe_discord_text(species_display(c['species']))
+    label = creature_label(c)
     approved = conn().execute(
         'SELECT submission_url FROM designs WHERE guild=? AND creature_id=? AND status=? ORDER BY id DESC LIMIT 1',
         (c['guild'], c['id'], 'approved')).fetchone()
     if approved:
-        species = f'[{species}]({approved["submission_url"]})'
-    nickname = f' ({safe_discord_text(c["nickname"])})' if c['nickname'] else ''
-    return f"**#{c['id']} {species}{nickname}** · Lv. {c['level']} · {', '.join(json.loads(c['traits']))}"
+        label = f'[{label}]({approved["submission_url"]})'
+    return f"**{label}** · Lv. {c['level']} · {', '.join(json.loads(c['traits']))} · Command ID: `{c['id']}`"
 
 
 def transacted(fn):
@@ -499,10 +536,10 @@ class CatchSelect(discord.ui.Select):
                     await interaction.message.edit(content=message, view=None)
                 return
             cid, gold, earned, leveled = outcome
-            level_msg = f' Active creature gained {earned} EXP.' if leveled else ''
+            level_msg = f' {creature_ref(leveled[0],gid)} gained {earned} EXP.' if leveled else ''
             if leveled and leveled[1]:
-                level_msg += f' #{leveled[0]} gained {leveled[1]} level(s).'
-            msg = (f'{interaction.user.mention} caught **{entry["species"]}** (#{cid}, Lv. 5)! '
+                level_msg += f' {creature_ref(leveled[0],gid)} gained {leveled[1]} level(s).'
+            msg = (f'{interaction.user.mention} caught **{entry["species"]}** (Lv. 5)! '
                    f'Traits: {", ".join(entry["traits"])}. Earned **{gold} Gold Coins**.'
                    + level_msg)
             await interaction.message.edit(content=msg, view=None)
@@ -568,6 +605,7 @@ async def post_spawn(guild_id: int,channel_id: int) -> None:
     species=random.choice(CREATURES)
     traits=roll_traits()
     embed=discord.Embed(title=f'Wild {species} appeared!',description='**Traits:** '+', '.join(traits)+'\n**Catch level:** 5\nUse **Catch!** to choose a ball.',color=discord.Color.orange())
+    embed.add_field(name='Classification', value=metadata_display(species), inline=False)
     token=random.getrandbits(63)
     message=await channel.send(embed=embed,view=CatchView(guild_id,token))
     spawns[guild_id]={'id':token,'species':species,'traits':traits,'caught':False,'message':message}
@@ -652,7 +690,7 @@ async def cspawn(interaction:discord.Interaction,creature:str,user:discord.Membe
     trait_list=parse_traits(traits)
     async with mutex:
         cid=transacted(lambda:create_creature(gid,user.id,creature,trait_list,level))
-    await feedback(interaction,f'Added **{creature}** #{cid} at Lv. {level} to {user.mention}. Traits: {", ".join(trait_list)}.',ephemeral=True)
+    await feedback(interaction,f'Added **{creature}** at Lv. {level} to {user.mention}. Traits: {", ".join(trait_list)}.\n' + metadata_display(creature),ephemeral=True)
 
 
 @bot.tree.command(name='evolve',description='Staff: replace a creature species with any capitalized species name.')
@@ -674,7 +712,7 @@ async def evolve(interaction:discord.Interaction,id:int,species:str):
             conn().execute('UPDATE creatures SET species=? WHERE id=? AND guild=?',(species,id,gid))
             return previous
         previous=transacted(perform_evolution)
-    await feedback(interaction,f'Creature #{id} evolved from **{safe_discord_text(previous)}** to **{safe_discord_text(species)}**.',False)
+    await feedback(interaction,f'{creature_ref(id,gid)} evolved from **{safe_discord_text(previous)}** to **{safe_discord_text(species)}**.',False)
 
 
 @bot.tree.command(name='clevel',description='Admin: add levels to a creature without replacing its level.')
@@ -687,7 +725,7 @@ async def clevel(interaction:discord.Interaction,creature_id:int,levels_to_add:a
         if not c:
             raise ValueError('Creature ID not found in this server.')
         conn().execute('UPDATE creatures SET level=level+? WHERE id=?',(levels_to_add,creature_id))
-    await feedback(interaction,f'#{creature_id} gained {levels_to_add} levels. Now Lv. {c["level"]+levels_to_add}.',False)
+    await feedback(interaction,f'{creature_label(c)} gained {levels_to_add} levels. Now Lv. {c["level"]+levels_to_add}.',False)
 
 
 @bot.tree.command(name='cdelete',description='Admin: permanently remove a creature, freeing its ID.')
@@ -700,7 +738,7 @@ async def cdelete(interaction:discord.Interaction,creature_id:int):
         if not c:
             raise ValueError('Creature ID not found in this server.')
         transacted(lambda:delete_creature(creature_id))
-    await feedback(interaction,f'Deleted #{creature_id}. Its ID can now be reused.',False)
+    await feedback(interaction,f'Deleted {creature_label(c)}. Its ID can now be reused.',False)
 
 
 @bot.tree.command(name='active',description='Choose your active creature to receive EXP from successful catches.')
@@ -710,7 +748,7 @@ async def active(interaction:discord.Interaction,id:int):
         c=own_creature(gid,uid,id)
         userrow(gid,uid)
         conn().execute('UPDATE users SET active_id=? WHERE guild=? AND user=?',(id,gid,uid))
-    await feedback(interaction,f'#{id} {species_display(c["species"])} is now active. EXP: {c["exp"]}/{exp_needed(c["level"])}.')
+    await feedback(interaction,f'{creature_label(c)} is now active. EXP: {c["exp"]}/{exp_needed(c["level"])}.')
 
 
 @bot.tree.command(name='candy',description='Use Rare Candies to raise your creature level.')
@@ -723,7 +761,7 @@ async def candy(interaction:discord.Interaction,id:int,quantity:app_commands.Ran
             conn().execute('UPDATE creatures SET level=level+? WHERE id=?',(quantity,id))
             return c['level']+quantity
         result=transacted(use)
-    await feedback(interaction,f'#{id} used {quantity} Rare Candy(s). Now Lv. {result}.')
+    await feedback(interaction,f'{creature_ref(id,gid)} used {quantity} Rare Candy(s). Now Lv. {result}.')
 
 
 @bot.tree.command(name='dice',description='Use one Dice to add a randomly selected new trait.')
@@ -740,7 +778,7 @@ async def dice(interaction:discord.Interaction,id:int):
             second=add_trait_to_creature(id,c,rolled)
             return rolled,second
         result=transacted(use)
-    await feedback(interaction,f'#{id} gained **{result[0]}**!' + (f' Hybrid species: **{result[1]}**.' if result[1] else ''))
+    await feedback(interaction,f'{creature_ref(id,gid)} gained **{result[0]}**!' + (f' Hybrid species: **{result[1]}**.' if result[1] else ''))
 
 
 trait_group=app_commands.Group(name='trait',description='Creature trait commands')
@@ -771,7 +809,7 @@ async def trait_add(interaction:discord.Interaction,id:int,trait:str,hybrid_spec
             change_item(gid,uid,used,-1)
             return used,second
         used,second=transacted(use)
-    await feedback(interaction,f'Used **{used}**. Added **{trait_name}** to creature #{id}.' + (f' Second species: **{second}**.' if second else ''))
+    await feedback(interaction,f'Used **{used}**. Added **{trait_name}** to **{creature_ref(id,gid)}**.' + (f' Second species: **{second}**.' if second else ''))
 
 bot.tree.add_command(trait_group)
 
@@ -782,7 +820,7 @@ async def creature_info(interaction:discord.Interaction,id:int):
     async with mutex:
         c=own_creature(gid,uid,id)
         current=userrow(gid,uid)['active_id']
-    await feedback(interaction,fmt_c(c)+f'\nEXP: {c["exp"]:,}/{exp_needed(c["level"]):,}' + (' · **ACTIVE**' if id==current else ''))
+    await feedback(interaction,fmt_c(c)+'\n'+metadata_display(c['species'])+f'\nEXP: {c["exp"]:,}/{exp_needed(c["level"]):,}' + (' · **ACTIVE**' if id==current else ''))
 
 
 @bot.tree.command(name='nickname',description='Give one of your creatures a nickname, or clear it.')
@@ -796,9 +834,9 @@ async def nickname(interaction:discord.Interaction,id:int,name:app_commands.Rang
         own_creature(gid,uid,id)
         conn().execute('UPDATE creatures SET nickname=? WHERE id=?',(name,id))
     if name:
-        await feedback(interaction,f'Creature #{id} is now nicknamed **{safe_discord_text(name)}**.')
+        await feedback(interaction,f'{creature_ref(id,gid)} is now nicknamed **{safe_discord_text(name)}**.')
     else:
-        await feedback(interaction,f'Nickname cleared for creature #{id}.')
+        await feedback(interaction,f'Nickname cleared for **{creature_ref(id,gid)}**.')
 
 
 design_group=app_commands.Group(name='design',description='Submit creature artwork and review submissions')
@@ -817,7 +855,7 @@ async def design_submit(interaction:discord.Interaction,id:int,image:discord.Att
     reward_user = artist or interaction.user
     await interaction.response.defer(thinking=True)
     header = (
-        f'**Creature design submission** · #{id} {safe_discord_text(species)}\n'
+        f'**Creature design submission** · {creature_ref(id,gid)}\n'
         f'Submitted by {interaction.user.mention}\n'
         + (f'Artist: {artist.mention}\n' if artist else '')
         + 'Pending staff review'
@@ -840,7 +878,7 @@ async def design_submit(interaction:discord.Interaction,id:int,image:discord.Att
         await posted.delete()
         raise
     public = (
-        f'**Design #{did}** · Creature #{id} {safe_discord_text(species)}\n'
+        f'**Design #{did}** · Creature {creature_ref(id,gid)}\n'
         f'Submitted by {interaction.user.mention}\n'
         + (f'Artist: {artist.mention}\n' if artist else '')
         + f'**PENDING** staff review\n'
@@ -848,7 +886,7 @@ async def design_submit(interaction:discord.Interaction,id:int,image:discord.Att
     )
     await posted.edit(content=public, allowed_mentions=discord.AllowedMentions(users=True, roles=False, everyone=False))
     await interaction.followup.send(
-        f'Design **#{did}** submitted for creature **#{id}**. Reward granted to {reward_user.mention}: **500 Gold Coins** and **1 Diamond Shard**. Review: {posted.jump_url}',
+        f'Design **#{did}** submitted for creature **{creature_ref(id,gid)}**. Reward granted to {reward_user.mention}: **500 Gold Coins** and **1 Diamond Shard**. Review: {posted.jump_url}',
         allowed_mentions=discord.AllowedMentions(users=True, roles=False, everyone=False))
 
 
@@ -871,7 +909,7 @@ async def design_approve(interaction:discord.Interaction,design_id:int):
                 ('approved',interaction.user.id,int(time.time()),design_id))
             return d
         d=transacted(approve)
-    await feedback(interaction,f'Approved design **#{design_id}** for creature **#{d["creature_id"]}**. Its inventory name now links to the [approved design]({d["submission_url"]}).')
+    await feedback(interaction,f'Approved design **#{design_id}** for creature **{creature_ref(d["creature_id"],gid)}**. Its inventory name now links to the [approved design]({d["submission_url"]}).')
 
 
 @design_group.command(name='deny',description='Staff: deny a pending creature design.')
@@ -890,7 +928,7 @@ async def design_deny(interaction:discord.Interaction,design_id:int,reason:app_c
                 ('denied',interaction.user.id,int(time.time()),design_id))
             return d
         d=transacted(deny)
-    message=f'Denied design **#{design_id}** for creature **#{d["creature_id"]}**.'
+    message=f'Denied design **#{design_id}** for creature **{creature_ref(d["creature_id"],gid)}**.'
     if reason:
         message+=f' Reason: {safe_discord_text(reason)}'
     await feedback(interaction,message)
@@ -936,7 +974,7 @@ async def art_submit(interaction:discord.Interaction,
     posted=await interaction.channel.send(
         f'**Art submission**\n'
         f'Submitted by {interaction.user.mention}\n'
-        f'Creature: **#{creature_id}**\n'
+        f'Creature: **{creature_ref(creature_id,gid)}**\n'
         f'Breakdown: {breakdown}\n'
         f'Total on approval: **{total:,} Gold Coins**, **{total//100:,} Diamond Shards**, and **{total//100:,} creature levels**\n'
         f'**PENDING** staff review',
@@ -957,13 +995,13 @@ async def art_submit(interaction:discord.Interaction,
     await posted.edit(content=(
         f'**Art #{aid}**\n'
         f'Submitted by {interaction.user.mention}\n'
-        f'Creature: **#{creature_id}**\n'
+        f'Creature: **{creature_ref(creature_id,gid)}**\n'
         f'Breakdown: {breakdown}\n'
         f'Total on approval: **{total:,} Gold Coins**, **{total//100:,} Diamond Shards**, and **{total//100:,} creature levels**\n'
         f'**PENDING** staff review'),
         allowed_mentions=discord.AllowedMentions(users=True, roles=False, everyone=False))
     await interaction.followup.send(
-        f'Art **#{aid}** submitted for creature **#{creature_id}**. On approval: **{total:,} Gold Coins**, **{total//100:,} Diamond Shards**, and **{total//100:,} levels**. Review: {posted.jump_url}')
+        f'Art **#{aid}** submitted for creature **{creature_ref(creature_id,gid)}**. On approval: **{total:,} Gold Coins**, **{total//100:,} Diamond Shards**, and **{total//100:,} levels**. Review: {posted.jump_url}')
 
 
 @art_group.command(name='approve',description='Staff: approve a pending art submission and pay it out.')
@@ -996,7 +1034,7 @@ async def art_approve(interaction:discord.Interaction,art_id:int):
         a,payout_gold,payout_shards,levels=transacted(approve)
     await feedback(interaction,
         f'Approved art **#{art_id}**. Paid <@{a["submitter"]}> **{payout_gold:,} Gold Coins** and **{payout_shards:,} Diamond Shards**.'
-        + (f' Creature **#{a["creature_id"]}** gained **{levels:,} levels**.' if a['creature_id'] is not None else ''))
+        + (f' Creature **{creature_ref(a["creature_id"],gid)}** gained **{levels:,} levels**.' if a['creature_id'] is not None else ''))
 
 
 @art_group.command(name='deny',description='Staff: deny a pending art submission.')
@@ -1089,7 +1127,7 @@ async def release(interaction:discord.Interaction,id:int):
     async with mutex:
         def execute():
             c=own_creature(gid,uid,id)
-            species=species_display(c['species'])
+            species=creature_label(c)
             gold=random.randint(50,100)
             item=roll_release_item()
             delete_creature(id)
@@ -1098,21 +1136,34 @@ async def release(interaction:discord.Interaction,id:int):
                 change_item(gid,uid,item,1)
             return species,gold,item
         species,gold,item=transacted(execute)
-    await feedback(interaction,f'Released **#{id} {safe_discord_text(species)}**. ID #{id} is available for reuse. Earned **{gold} Gold Coins**.' + (f' Item drop: **{item}**!' if item else ' No item dropped.'))
+    await feedback(interaction,f'Released **{species}**. Its ID is available for reuse. Earned **{gold} Gold Coins**.' + (f' Item drop: **{item}**!' if item else ' No item dropped.'))
 
 
 item_group=app_commands.Group(name='item',description='Use eggs, trait erasers, and DNA splicers')
 @item_group.command(name='use',description='Use an egg, Trait Eraser, or DNA Splicer.')
-@app_commands.choices(item=[app_commands.Choice(name=x,value=x) for x in ('Species Egg','Trait Egg','Rare Egg','Trait Eraser','DNA Splicer')])
-@app_commands.autocomplete(species=creature_autocomplete,trait=trait_autocomplete)
+@app_commands.choices(item=[app_commands.Choice(name=x,value=x) for x in ('Species Egg','Trait Egg','Rare Egg','Series Egg','Type Egg','Trait Eraser','DNA Splicer')])
+@app_commands.autocomplete(species=creature_autocomplete,trait=trait_autocomplete,series=series_autocomplete,type=type_autocomplete)
 async def item_use(interaction:discord.Interaction,item: str,
                    id:int|None=None,species:str|None=None,trait:str|None=None,
-                   remove_species:app_commands.Range[int,1,2]|None=None):
+                   remove_species:app_commands.Range[int,1,2]|None=None,
+                   series:str|None=None,type:str|None=None):
     gid,uid=guild_only(interaction)
-    item_names={name.casefold():name for name in ('Species Egg','Trait Egg','Rare Egg','Trait Eraser','DNA Splicer')}
+    item_names={name.casefold():name for name in ('Species Egg','Trait Egg','Rare Egg','Series Egg','Type Egg','Trait Eraser','DNA Splicer')}
     item=item_names.get(item.strip().casefold())
     if item is None:
-        raise ValueError('Choose Species Egg, Trait Egg, Rare Egg, Trait Eraser, or DNA Splicer.')
+        raise ValueError('Choose Species Egg, Trait Egg, Rare Egg, Series Egg, Type Egg, Trait Eraser, or DNA Splicer.')
+    if item in ('Series Egg', 'Type Egg'):
+        pool = egg_pool(item, series if item == 'Series Egg' else type)
+        async with mutex:
+            def hatch_filtered():
+                name = random.choice(pool)
+                traits = random.sample(NORMAL_TRAITS, random.randint(1,4))
+                change_item(gid,uid,item,-1)
+                cid = create_creature(gid,uid,name,traits,1)
+                return cid, name, traits
+            cid, name, traits = transacted(hatch_filtered)
+        await feedback(interaction,f'Hatched **{safe_discord_text(name)}**, Lv. 1, traits: **{", ".join(traits)}**.\n' + metadata_display(name))
+        return
     # Slash command optional fields supply context appropriate to each item.
     if item in ('Species Egg','Trait Egg','Rare Egg'):
         if item in ('Species Egg','Rare Egg') and species is None:
@@ -1134,7 +1185,7 @@ async def item_use(interaction:discord.Interaction,item: str,
                 cid=create_creature(gid,uid,raw_species,[t],1)
                 return cid,raw_species,t
             cid,raw_species,t=transacted(hatch)
-        await feedback(interaction,f'Hatched **#{cid} {safe_discord_text(species_display(raw_species))}**, Lv. 1, trait: **{t}**.')
+        await feedback(interaction,f'Hatched **{safe_discord_text(species_display(raw_species))}**, Lv. 1, trait: **{t}**.')
         return
     if id is None:
         raise ValueError('Supply the creature ID.')
@@ -1167,7 +1218,7 @@ async def item_use(interaction:discord.Interaction,item: str,
                            (species_entries[0],json.dumps(traits),id))
             return f'Removed hybrid species {removed}; remaining species: {species_entries[0]}'
         result=transacted(modify)
-    await feedback(interaction,f'Used **{item}** on #{id}. {result}.')
+    await feedback(interaction,f'Used **{item}** on **{creature_ref(id,gid)}**. {result}.')
 bot.tree.add_command(item_group)
 
 
@@ -1297,7 +1348,7 @@ async def trade(interaction:discord.Interaction,user:discord.Member,
     view=TradeView(gid,uid,user.id,give_creature_id,want_creature_id,gi,wi,give_quantity,want_quantity,give_gold,want_gold,give_shards,want_shards)
     def describe(cid,item,qty,gold,shards):
         bits=[]
-        if cid is not None: bits.append(f'Creature #{cid}')
+        if cid is not None: bits.append(f'Creature **{creature_ref(cid,gid)}**')
         if item: bits.append(f'{qty}× {item}')
         if gold: bits.append(f'{gold:,} Gold Coins')
         if shards: bits.append(f'{shards:,} Diamond Shards')

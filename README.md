@@ -8,7 +8,7 @@ A Python 3.11+ Discord creature-collection bot using discord.py and SQLite.
 2. Turn on the **Server Members Intent** under the bot's privileged gateway intents. This lets the bot clean up inventories when users leave a server.
 3. Invite the bot using the **bot** and **applications.commands** OAuth2 scopes. Give it **View Channels**, **Send Messages**, **Embed Links**, **Read Message History**, and **Manage Messages** so it can remove expired wild spawns. You can restrict the Manage Messages permission to the spawn channel.
 4. Install Python 3.11 or newer. In this folder run `pip install -r requirements.txt`.
-5. Copy `.env.example` to `.env`; add `DISCORD_TOKEN=...`. Never commit `.env` to GitHub.
+5. Copy `env.example` to `.env`; add `DISCORD_TOKEN=...`. Never commit `.env` to GitHub.
 6. Run `python bot.py`. Use `/spawnchannel #your-channel` in your Discord server. The bot spawns every five minutes. `/spawnnow` immediately posts a test spawn.
 7. Global slash commands can take time to appear. Set `TEST_GUILD_ID` to your development server ID to sync commands to that server immediately; remove it for global use.
 
@@ -112,3 +112,19 @@ Before deploying, back up your SQLite database. This update uses the existing ta
 `/art submit image creature_id type finish shading [type2] [type3] [animated]` requires a creature ID owned by the submitter. The image and rewards are held for staff review. `/art approve art_id` awards the existing Gold Coins and Diamond Shards plus **1 level per 100 Gold Coins earned** (`total_gc // 100`) directly to that creature. For example, a 700-Gold-Coin payout adds 7 levels. Approval requires the creature to remain in the submitter's inventory. Denied art awards nothing. Existing pending art submissions created before this change can still be approved for currency only. The `creature_id` column is added automatically to existing databases.
 
 `/evolve id species` is staff-only, using the Manage Server permission. Species can be any manually entered name, including names absent from `creatures.txt`. The first letter must be capitalized. No species autocomplete is used. Evolution replaces the creature's species (including any hybrid combination) without changing its other properties.
+
+## Type and series update
+
+All 1,056 catalog creatures have the exact types and series supplied in the requirements, stored in `creature_metadata.json`. Multiple types and series are retained (including Flowish and Dandylion). Classification is resolved from species at display time, so existing saved creatures receive these assignments without changing their IDs or database rows. Hybrids show the combined classifications. Manually evolved species outside the mapping display Unknown.
+
+- Buy **Series Egg** or **Type Egg** with `/shop buy`: each costs **500 Gold Coins OR 5 Diamond Shards**.
+- `/item use item:Series Egg series:pokemon` hatches a random creature from the selected series.
+- `/item use item:Type Egg type:fire` hatches a random creature with the selected type.
+- Series and type fields support autocomplete and case-insensitive matching. Creatures with multiple classifications are eligible for each of them.
+- Each new egg gives one level-1 creature with **1–4 distinct random regular traits**, using the existing spawnable trait pool. Species selection is uniform within the eligible pool. Invalid selections or failed hatches do not consume an egg.
+- Wild spawn announcements and `/creature` include types and series.
+- Creature references use the nickname, falling back to species when unnamed. Inventory/detail listings retain a separately labeled **Command ID** for commands; database IDs and command parameters are unchanged. Design and art submission IDs remain unchanged.
+
+Restart the bot to load the catalog and sync the updated commands. Existing eggs, balances, nicknames, designs, trades, and creature IDs remain compatible.
+
+Run the offline regression checks with `python -m unittest -v test_bot`. They use temporary in-memory databases and mocked Discord responses; no token is needed. Live Discord connectivity requires your existing bot configuration.
