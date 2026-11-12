@@ -1,4 +1,4 @@
-"""Sunny the Junipyro: Discord creature collecting and trading bot."""
+"""Sunny the Junipyro: Discord creature storage, customization, and trading bot."""
 from __future__ import annotations
 
 import asyncio
@@ -14,7 +14,7 @@ from pathlib import Path
 
 import discord
 from discord import app_commands
-from discord.ext import commands, tasks
+from discord.ext import commands
 from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent
@@ -34,16 +34,8 @@ SERIES_NAMES = sorted({t for data in METADATA.values() for t in data['series']})
 TRAIT_LOOKUP = {s.casefold(): s for s in ALL_TRAITS}
 ITEMS = {
     'Rare Candy': {'gold': 500, 'shards': 2},
-    'Pokeball': {'gold': 100, 'shards': 1},
-    'Great Ball': {'gold': 300, 'shards': 2},
-    'Ultra Ball': {'gold': 600, 'shards': 4},
     'Dice': {'gold': 1000, 'shards': 1},
     'Trait Brush': {'gold': 1500, 'shards': 5},
-    'Series Egg': {'gold': 500, 'shards': 5},
-    'Type Egg': {'gold': 500, 'shards': 5},
-    'Species Egg': {'gold': 2000, 'shards': 20},
-    'Trait Egg': {'gold': 1000, 'shards': 5},
-    'Rare Egg': {'gold': 10000, 'shards': 100},
     'Trait Eraser': {'gold': 2000, 'shards': 15},
     'DNA Splicer': {'gold': 1000, 'shards': 9},
 }
@@ -52,7 +44,6 @@ SPECIFIC_BRUSHES = {f'{trait} Trait Brush': trait for trait in ALL_TRAITS}
 RARE_BRUSH_TRAITS = set(NOSPAWN_TRAITS)
 ITEMS.update({name: {'gold': None, 'shards': None} for name in SPECIFIC_BRUSHES})
 ITEM_LOOKUP = {s.casefold(): s for s in ITEMS}
-BALL_RATES = {'Pokeball': 0.40, 'Great Ball': 0.60, 'Ultra Ball': 0.80}
 ART_TYPES = {'Headshot': 200, 'Halfbody': 500, 'Fullbody': 1000}
 ART_FINISH = {'Sketch': 0, 'Lined': 100, 'Loose colour': 150, 'Full colour': 200, 'Coloured lines / Lineless': 250}
 ART_SHADING = {'Unshaded': 0, 'Minimal shading': 200, 'Rendered': 500}
@@ -65,8 +56,6 @@ intents.members = True  # Enables cleanup when members leave; enable this in Dev
 bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 db: sqlite3.Connection | None = None
 mutex = asyncio.Lock()
-spawns: dict[int, dict] = {}
-spawn_locks: dict[int, asyncio.Lock] = {}
 
 
 def conn() -> sqlite3.Connection:
@@ -233,26 +222,6 @@ def exp_needed(level: int) -> int:
     return (10 * pow(6,level-1) + pow(5,level-1)-1) // pow(5,level-1)
 
 
-def give_catch_exp(guild: int, user: int, exp: int) -> tuple[int,int] | None:
-    r = userrow(guild,user)
-    cid = r['active_id']
-    if cid is None:
-        return None
-    c = conn().execute('SELECT * FROM creatures WHERE id=? AND guild=? AND owner=?',(cid,guild,user)).fetchone()
-    if c is None:
-        conn().execute('UPDATE users SET active_id=NULL,exp=0 WHERE guild=? AND user=?',(guild,user))
-        return None
-    level = c['level']
-    pool = c['exp']+exp
-    raised = 0
-    while pool >= exp_needed(level):
-        pool -= exp_needed(level)
-        level += 1
-        raised += 1
-    conn().execute('UPDATE creatures SET level=?,exp=? WHERE id=?',(level,pool,cid))
-    return cid,raised
-
-
 def canonical_creature(s: str) -> str:
     c = CREATURE_LOOKUP.get(s.strip().casefold())
     if c is None:
@@ -275,11 +244,6 @@ def parse_traits(s: str, allow_nospawn: bool=True) -> list[str]:
             raise ValueError('A creature cannot have the same trait twice.')
         result.append(t)
     return result
-
-
-def roll_traits() -> list[str]:
-    # 1 to 3 distinct spawnable traits. Basic is allowed as given in the list.
-    return random.sample(NORMAL_TRAITS, random.randint(1,3))
 
 
 def roll_die_trait(existing: list[str]) -> str | None:
@@ -337,18 +301,15 @@ def add_trait_to_creature(cid: int, creature: sqlite3.Row, trait: str, hybrid_sp
 
 
 def roll_release_item() -> str | None:
-    """50% item chance; Rare Egg occurs in 1% of all releases."""
+    """Every release has a 50% chance to award one specific trait brush.
+
+    Epic is particularly rare, and other NOSPAWN brushes have lower weights.
+    """
     if random.random() >= 0.5:
         return None
-    if random.random() < 0.02:
-        return 'Rare Egg'
-    # Two regular eggs share the pool with the trait brushes. Epic is
-    # exactly 1% of brush rewards; remaining rare brushes have low weight.
-    if random.random() < 0.08:
-        return random.choice(['Species Egg', 'Trait Egg'])
-    if random.random() < 0.01:
+    if random.random() < 0.01 and 'Epic Trait Brush' in SPECIFIC_BRUSHES:
         return 'Epic Trait Brush'
-    brush_pool = [name for name,trait in SPECIFIC_BRUSHES.items() if trait != 'Epic']
+    brush_pool = [name for name, trait in SPECIFIC_BRUSHES.items() if trait != 'Epic']
     brush_weights = [0.25 if SPECIFIC_BRUSHES[name] in RARE_BRUSH_TRAITS else 4.0 for name in brush_pool]
     return random.choices(brush_pool, weights=brush_weights, k=1)[0]
 
@@ -372,16 +333,6 @@ def metadata_display(raw: str) -> str:
               for value in METADATA.get(name.casefold(), {}).get(key, ['Unknown'])))
               for key in ('types', 'series')}
     return '**Type:** ' + ', '.join(values['types']) + '\n**Series:** ' + ', '.join(values['series'])
-
-
-def egg_pool(item: str, selection: str | None) -> list[str]:
-    key = 'series' if item == 'Series Egg' else 'types'
-    if not selection or not selection.strip():
-        raise ValueError('Choose a ' + ('series.' if key == 'series' else 'type.'))
-    pool = [name for name in CREATURES if selection.strip().casefold() in METADATA.get(name.casefold(), {}).get(key, [])]
-    if not pool:
-        raise ValueError('No eligible creatures for that ' + ('series.' if key == 'series' else 'type.'))
-    return pool
 
 
 async def series_autocomplete(interaction: discord.Interaction, current: str):
@@ -476,156 +427,6 @@ def art_breakdown(type_names: list[str], finish: str, shading: str, animated: st
     return ' + '.join(bits)
 
 
-class CatchSelect(discord.ui.Select):
-    def __init__(self,guild_id: int,spawn_id: int,counts: dict[str,int],owner_id:int):
-        self.guild_id,self.spawn_id,self.owner_id=guild_id,spawn_id,owner_id
-        opts=[discord.SelectOption(label=k,description=f'{int(v*100)}% chance · owned: {counts[k]}',value=k)
-              for k,v in BALL_RATES.items() if counts[k]>0]
-        super().__init__(placeholder='Choose a Pokéball',min_values=1,max_values=1,options=opts)
-
-    async def callback(self, interaction: discord.Interaction) -> None:
-        # Acknowledge the dropdown immediately. Discord expires unacknowledged
-        # component interactions after roughly three seconds.
-        if interaction.user.id != self.owner_id:
-            await feedback(interaction, 'This Pokéball menu belongs to another player. Click Catch! on the wild spawn to open your own.')
-            return
-        await interaction.response.defer(thinking=False)
-        try:
-            gid, uid = guild_only(interaction)
-            lock = spawn_locks.setdefault(gid, asyncio.Lock())
-            async with lock:
-                async with mutex:
-                    entry = spawns.get(gid)
-                    if not entry or entry['id'] != self.spawn_id or entry['caught']:
-                        await feedback(interaction, 'This wild creature is no longer available.')
-                        return
-                    ball = self.values[0]
-                    if item_count(gid, uid, ball) < 1:
-                        await feedback(interaction, f'You have no {ball}s left.')
-                        return
-
-                    def roll():
-                        change_item(gid, uid, ball, -1)
-                        success = random.random() < BALL_RATES[ball]
-                        if not success:
-                            return None
-                        cid = create_creature(gid, uid, entry['species'], entry['traits'], 5)
-                        gold = random.randint(1, 50)
-                        change_money(gid, uid, 'gold', gold)
-                        earned = random.randint(10, 100)
-                        leveled = give_catch_exp(gid, uid, earned)
-                        return cid, gold, earned, leveled
-
-                    outcome = transacted(roll)
-                    if outcome:
-                        entry['caught'] = True
-
-            if not outcome:
-                # The wild spawn remains catchable. Refresh this public menu so
-                # the player can try again, including with a different ball.
-                async with mutex:
-                    remaining = {name: item_count(gid, uid, name) for name in BALL_RATES}
-                message = (f'{interaction.user.mention} threw a **{ball}**, but the '
-                           f'**{entry["species"]}** escaped! One {ball} was used.')
-                if any(remaining.values()):
-                    message += '\nChoose another Pokéball to try again.'
-                    await interaction.message.edit(content=message,
-                        view=BallMenu(gid, self.spawn_id, remaining, uid))
-                else:
-                    message += '\nYou have no Pokéballs left. Use /shop buy to get more, then click Catch! again.'
-                    await interaction.message.edit(content=message, view=None)
-                return
-            cid, gold, earned, leveled = outcome
-            level_msg = f' {creature_ref(leveled[0],gid)} gained {earned} EXP.' if leveled else ''
-            if leveled and leveled[1]:
-                level_msg += f' {creature_ref(leveled[0],gid)} gained {leveled[1]} level(s).'
-            msg = (f'{interaction.user.mention} caught **{entry["species"]}** (Lv. 5)! '
-                   f'Traits: {", ".join(entry["traits"])}. Earned **{gold} Gold Coins**.'
-                   + level_msg)
-            await interaction.message.edit(content=msg, view=None)
-            if entry.get('message'):
-                try:
-                    await entry['message'].edit(view=None)
-                except discord.HTTPException:
-                    pass
-        except Exception:
-            log.exception('Error processing Pokéball selection in guild %s', interaction.guild_id)
-            try:
-                await feedback(interaction, 'The catch encountered an error. Please check the Railway logs.')
-            except discord.HTTPException:
-                log.exception('Could not send Pokéball error response')
-
-
-class BallMenu(discord.ui.View):
-    def __init__(self,guild_id: int,spawn_id: int,counts: dict[str,int],owner_id:int):
-        super().__init__(timeout=180)
-        self.add_item(CatchSelect(guild_id,spawn_id,counts,owner_id))
-
-
-class CatchView(discord.ui.View):
-    def __init__(self,guild_id: int,spawn_id: int):
-        super().__init__(timeout=None)
-        self.guild_id,self.spawn_id=guild_id,spawn_id
-
-    @discord.ui.button(label='Catch!',style=discord.ButtonStyle.success,custom_id='sunny:catch')
-    async def catch(self,interaction: discord.Interaction,button: discord.ui.Button):
-        gid,uid=guild_only(interaction)
-        if gid!=self.guild_id or not spawns.get(gid) or spawns[gid]['id']!=self.spawn_id or spawns[gid]['caught']:
-            await feedback(interaction,'This spawn has expired.')
-            return
-        async with mutex:
-            counts={k:item_count(gid,uid,k) for k in BALL_RATES}
-        if not any(counts.values()):
-            await feedback(interaction,'You need a ball. Purchase one with /shop buy.')
-            return
-        await interaction.response.send_message(f'{interaction.user.mention}, select a ball to throw:',view=BallMenu(gid,self.spawn_id,counts,uid),ephemeral=False)
-
-
-async def post_spawn(guild_id: int,channel_id: int) -> None:
-    channel=bot.get_channel(channel_id)
-    if channel is None:
-        try:
-            channel=await bot.fetch_channel(channel_id)
-        except (discord.NotFound,discord.Forbidden,discord.HTTPException):
-            return
-    if not hasattr(channel,'send'):
-        return
-    old=spawns.pop(guild_id,None)
-    if old and old.get('message'):
-        if not old.get('caught'):
-            try:
-                await old['message'].delete()
-            except discord.HTTPException:
-                pass
-        else:
-            try:
-                await old['message'].edit(view=None)
-            except discord.HTTPException:
-                pass
-    species=random.choice(CREATURES)
-    traits=roll_traits()
-    embed=discord.Embed(title=f'Wild {species} appeared!',description='**Traits:** '+', '.join(traits)+'\n**Catch level:** 5\nUse **Catch!** to choose a ball.',color=discord.Color.orange())
-    embed.add_field(name='Classification', value=metadata_display(species), inline=False)
-    token=random.getrandbits(63)
-    message=await channel.send(embed=embed,view=CatchView(guild_id,token))
-    spawns[guild_id]={'id':token,'species':species,'traits':traits,'caught':False,'message':message}
-
-
-@tasks.loop(minutes=5)
-async def spawn_loop():
-    rows=conn().execute('SELECT * FROM config WHERE channel IS NOT NULL').fetchall()
-    for config in rows:
-        try:
-            await post_spawn(config['guild'],config['channel'])
-        except (discord.HTTPException,ValueError,sqlite3.Error):
-            log.exception('Unable to spawn in guild %s',config['guild'])
-
-
-@spawn_loop.before_loop
-async def before_spawn():
-    await bot.wait_until_ready()
-
-
 @bot.event
 async def on_ready():
     log.info('Logged in as %s',bot.user)
@@ -649,41 +450,18 @@ async def command_error(interaction:discord.Interaction,error:app_commands.AppCo
         root=error.original
     else:
         root=error
-    spawn_admin = interaction.command is not None and interaction.command.name in ('cspawn', 'spawnnow')
+    private_error = interaction.command is not None and interaction.command.name == 'cadd'
     if isinstance(root,ValueError):
-        await feedback(interaction,str(root),ephemeral=spawn_admin)
+        await feedback(interaction,str(root),ephemeral=private_error)
     else:
         log.exception('Slash command failed',exc_info=error)
-        await feedback(interaction,'An error occurred. Please contact a server admin.',ephemeral=spawn_admin)
+        await feedback(interaction,'An error occurred. Please contact a server admin.',ephemeral=private_error)
 
 
-@bot.tree.command(name='spawnchannel',description='Admin: set the channel for five-minute wild creature spawns.')
-@app_commands.default_permissions(manage_guild=True)
-async def spawnchannel(interaction:discord.Interaction,channel:discord.TextChannel):
-    admin_only(interaction)
-    gid,_=guild_only(interaction)
-    async with mutex:
-        conn().execute('INSERT INTO config(guild,channel) VALUES(?,?) ON CONFLICT(guild) DO UPDATE SET channel=excluded.channel',(gid,channel.id))
-    await feedback(interaction,f'Wild creatures will spawn in {channel.mention} every 5 minutes.')
-
-
-@bot.tree.command(name='spawnnow',description='Admin: immediately spawn one wild creature in the configured channel.')
-@app_commands.default_permissions(manage_guild=True)
-async def spawnnow(interaction:discord.Interaction):
-    admin_only(interaction)
-    gid,_=guild_only(interaction)
-    row=conn().execute('SELECT channel FROM config WHERE guild=?',(gid,)).fetchone()
-    if not row:
-        raise ValueError('Set /spawnchannel first.')
-    await interaction.response.defer(ephemeral=True,thinking=True)
-    await post_spawn(gid,row['channel'])
-    await feedback(interaction,'Wild creature spawned.',ephemeral=True)
-
-
-@bot.tree.command(name='cspawn',description='Admin: grant a creature and any comma-separated traits.')
+@bot.tree.command(name='cadd',description='Admin: add a creature directly to a user’s storage.')
 @app_commands.default_permissions(manage_guild=True)
 @app_commands.autocomplete(creature=creature_autocomplete)
-async def cspawn(interaction:discord.Interaction,creature:str,user:discord.Member,traits:str,level:app_commands.Range[int,1,1000000]=1):
+async def cadd(interaction:discord.Interaction,creature:str,user:discord.Member,traits:str,level:app_commands.Range[int,1,1000000]=1):
     admin_only(interaction)
     gid,_=guild_only(interaction)
     creature=canonical_creature(creature)
@@ -741,7 +519,7 @@ async def cdelete(interaction:discord.Interaction,creature_id:int):
     await feedback(interaction,f'Deleted {creature_label(c)}. Its ID can now be reused.',False)
 
 
-@bot.tree.command(name='active',description='Choose your active creature to receive EXP from successful catches.')
+@bot.tree.command(name='active',description='Mark one of your stored creatures as active.')
 async def active(interaction:discord.Interaction,id:int):
     gid,uid=guild_only(interaction)
     async with mutex:
@@ -1139,56 +917,17 @@ async def release(interaction:discord.Interaction,id:int):
     await feedback(interaction,f'Released **{species}**. Its ID is available for reuse. Earned **{gold} Gold Coins**.' + (f' Item drop: **{item}**!' if item else ' No item dropped.'))
 
 
-item_group=app_commands.Group(name='item',description='Use eggs, trait erasers, and DNA splicers')
-@item_group.command(name='use',description='Use an egg, Trait Eraser, or DNA Splicer.')
-@app_commands.choices(item=[app_commands.Choice(name=x,value=x) for x in ('Species Egg','Trait Egg','Rare Egg','Series Egg','Type Egg','Trait Eraser','DNA Splicer')])
-@app_commands.autocomplete(species=creature_autocomplete,trait=trait_autocomplete,series=series_autocomplete,type=type_autocomplete)
-async def item_use(interaction:discord.Interaction,item: str,
-                   id:int|None=None,species:str|None=None,trait:str|None=None,
-                   remove_species:app_commands.Range[int,1,2]|None=None,
-                   series:str|None=None,type:str|None=None):
+item_group=app_commands.Group(name='item',description='Use creature customization items')
+@item_group.command(name='use',description='Use a Trait Eraser or DNA Splicer on a stored creature.')
+@app_commands.choices(item=[app_commands.Choice(name=x,value=x) for x in ('Trait Eraser','DNA Splicer')])
+@app_commands.autocomplete(trait=trait_autocomplete)
+async def item_use(interaction:discord.Interaction,item:str,id:int,
+                   trait:str|None=None,remove_species:app_commands.Range[int,1,2]|None=None):
     gid,uid=guild_only(interaction)
-    item_names={name.casefold():name for name in ('Species Egg','Trait Egg','Rare Egg','Series Egg','Type Egg','Trait Eraser','DNA Splicer')}
+    item_names={name.casefold():name for name in ('Trait Eraser','DNA Splicer')}
     item=item_names.get(item.strip().casefold())
     if item is None:
-        raise ValueError('Choose Species Egg, Trait Egg, Rare Egg, Series Egg, Type Egg, Trait Eraser, or DNA Splicer.')
-    if item in ('Series Egg', 'Type Egg'):
-        pool = egg_pool(item, series if item == 'Series Egg' else type)
-        async with mutex:
-            def hatch_filtered():
-                name = random.choice(pool)
-                traits = random.sample(NORMAL_TRAITS, random.randint(1,4))
-                change_item(gid,uid,item,-1)
-                cid = create_creature(gid,uid,name,traits,1)
-                return cid, name, traits
-            cid, name, traits = transacted(hatch_filtered)
-        await feedback(interaction,f'Hatched **{safe_discord_text(name)}**, Lv. 1, traits: **{", ".join(traits)}**.\n' + metadata_display(name))
-        return
-    # Slash command optional fields supply context appropriate to each item.
-    if item in ('Species Egg','Trait Egg','Rare Egg'):
-        if item in ('Species Egg','Rare Egg') and species is None:
-            raise ValueError('Choose a species.')
-        if item in ('Trait Egg','Rare Egg') and trait is None:
-            raise ValueError('Choose a trait.')
-        selected_species=canonical_creature(species) if species is not None and item != 'Trait Egg' else None
-        selected_trait=parse_traits(trait)[0] if trait is not None and item != 'Species Egg' else None
-        if selected_trait and len(parse_traits(trait)) != 1:
-            raise ValueError('Choose exactly one trait.')
-        async with mutex:
-            def hatch():
-                if item_count(gid,uid,item)<1:
-                    raise ValueError('You do not have a '+item+'.')
-                name=selected_species or random.choice(CREATURES)
-                t=selected_trait or 'Basic'
-                raw_species=add_hybrid_species(name) if t == 'Hybrid' else name
-                change_item(gid,uid,item,-1)
-                cid=create_creature(gid,uid,raw_species,[t],1)
-                return cid,raw_species,t
-            cid,raw_species,t=transacted(hatch)
-        await feedback(interaction,f'Hatched **{safe_discord_text(species_display(raw_species))}**, Lv. 1, trait: **{t}**.')
-        return
-    if id is None:
-        raise ValueError('Supply the creature ID.')
+        raise ValueError('Choose Trait Eraser or DNA Splicer.')
     async with mutex:
         def modify():
             c=own_creature(gid,uid,id)
@@ -1363,11 +1102,12 @@ async def trade(interaction:discord.Interaction,user:discord.Member,
 @bot.tree.command(name='help_sunny',description='List Sunny the Junipyro commands.')
 async def help_sunny(interaction:discord.Interaction):
     await feedback(interaction,
-        '**Collect:** /active, /inventory creatures, /inventory items, /balance, /release, /item use, /candy, /dice, /trait add, /nickname, /design submit, /art submit\n'
+        '**Storage:** /inventory creatures, /inventory items, /creature, /balance, /active, /release, /nickname\n'
+        '**Customize:** /dice, /trait add, /item use, /candy, /design submit, /art submit\n'
         '**Shop:** /shop view, /shop buy\n'
         '**Trade:** /trade\n'
-        '**Admin:** /spawnchannel, /spawnnow, /cspawn, /clevel, /cdelete, /giveitem, /takeitem, /givecurrency, /takecurrency, /design approve, /design deny, /art approve, /art deny\n'
-        'Catches grant 1–50 Gold Coins and 10–100 EXP to your active creature. Wild catches enter your inventory at Lv. 5.',False)
+        '**Admin:** /cadd, /evolve, /clevel, /cdelete, /giveitem, /takeitem, /givecurrency, /takecurrency, /design approve, /design deny, /art approve, /art deny\n'
+        'Admins add creatures to storage with /cadd. Releasing a creature earns 50–100 GC and has a 50% chance of a specific Trait Brush.',False)
 
 
 async def main():
@@ -1382,7 +1122,6 @@ async def main():
             await bot.tree.sync(guild=guild)
         else:
             await bot.tree.sync()
-        spawn_loop.start()
     bot.setup_hook=setup_hook
     await bot.start(TOKEN)
 
